@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>个人主页 | 音乐谱面 & 在线游戏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="theme-toggle">
+        <button id="theme-btn" class="theme-btn">🌙 深色模式</button>
+    </div>
+    
+    <div class="container">
+        <!-- 个人资料卡片 -->
+        <div class="profile-card">
+            <div class="avatar-container">
+                <img id="avatar" class="avatar" src="images/avatar.jpg" alt="头像">
+            </div>
+            <h1 id="author-name">加载中...</h1>
+            <p id="bio" class="bio">加载中...</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="sheet-count">0</span>
+                    <span class="stat-label">谱面数量</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="update-date">-</span>
+                    <span class="stat-label">最后更新</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 功能按钮区域 -->
+        <div class="buttons-container">
+            <button id="sheet-btn" class="action-btn sheet-btn">
+                <span class="btn-icon">🎵</span>
+                <span class="btn-text">谱面文件</span>
+            </button>
+            <button id="game-btn" class="action-btn game-btn">
+                <span class="btn-icon">🎮</span>
+                <span class="btn-text">在线游戏</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 谱面文件窗口 -->
+    <div id="sheet-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📁 谱面文件</h2>
+                <span class="close">&times;</span>
+            </div>
+            <!-- 子导航栏 -->
+            <div class="file-tabs">
+                <button class="tab-btn active" data-type="zip">ZIP 文件</button>
+                <button class="tab-btn" data-type="pez">PEZ 文件</button>
+            </div>
+            <div id="file-list" class="file-list">
+                <p>加载中...</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 | 个人主页 | 数据实时更新</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

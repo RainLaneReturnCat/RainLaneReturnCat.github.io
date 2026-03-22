@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>游戏中心 | 在线游戏选择</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 游戏页面专属样式 */
+        .games-container {
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .games-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .games-header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .games-header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        body.dark-mode .games-header p {
+            color: #b0b0b0;
+        }
+        
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 35px 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        body.dark-mode .game-card {
+            background: rgba(30, 30, 46, 0.95);
+        }
+        
+        .game-card:hover:not(.coming-soon) {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .game-card.coming-soon {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .game-card.coming-soon:hover {
+            transform: none;
+        }
+        
+        .game-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        .game-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+        }
+        
+        body.dark-mode .game-title {
+            color: #e0e0e0;
+        }
+        
+        .game-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        body.dark-mode .game-description {
+            color: #b0b0b0;
+        }
+        
+        .coming-soon-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+        
+        .back-btn:hover {
+            transform: translateX(-5px);
+            background: rgba(0, 0, 0, 0.8);
+        }
+        
+        body.dark-mode .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        body.dark-mode .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        @media (max-width: 600px) {
+            .game-grid {
+                gap: 15px;
+            }
+            
+            .game-card {
+                padding: 25px 15px;
+            }
+            
+            .game-icon {
+                font-size: 48px;
+            }
+            
+            .game-title {
+                font-size: 18px;
+            }
+            
+            .game-description {
+                font-size: 12px;
+            }
+            
+            .games-header h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-toggle">
+        <button id="theme-btn" class="theme-btn">🌙 深色模式</button>
+    </div>
+    
+    <div class="games-container">
+        <button class="back-btn" onclick="location.href='index.html'">
+            ← 返回主页
+        </button>
+        
+        <div class="games-header">
+            <h1>🎮 游戏中心</h1>
+            <p>选择你喜欢的游戏开始体验</p>
+        </div>
+        
+        <div class="game-grid" id="game-grid">
+            <!-- 游戏选项将通过JS动态生成 -->
+        </div>
+        
+        <footer style="position: relative; margin-top: 40px;">
+            <p>© 2024 | 个人主页 | 选择你喜欢的游戏</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 游戏列表配置
+        const games = [
+            { 
+                id: 1, 
+                name: "立体迷宫", 
+                icon: "🧩", 
+                description: "3D迷宫探险游戏，寻找出口挑战你的空间感！", 
+                url: "games/litimigong.html", 
+                available: true 
+            },
+            { 
+                id: 2, 
+                name: "敬请期待", 
+                icon: "🎮", 
+                description: "全新的游戏体验即将上线", 
+                url: "#", 
+                available: false 
+            },
+            { 
+                id: 3, 
+                name: "敬请期待", 
+                icon: "🎯", 
+                description: "全新的游戏体验即将上线", 
+                url: "#", 
+                available: false 
+            },
+            { 
+                id: 4, 
+                name: "敬请期待", 
+                icon: "🎲", 
+                description: "全新的游戏体验即将上线", 
+                url: "#", 
+                available: false 
+            },
+            { 
+                id: 5, 
+                name: "敬请期待", 
+                icon: "⚡", 
+                description: "全新的游戏体验即将上线", 
+                url: "#", 
+                available: false 
+            },
+            { 
+                id: 6, 
+                name: "敬请期待", 
+                icon: "🎨", 
+                description: "全新的游戏体验即将上线", 
+                url: "#", 
+                available: false 
+            },
+            { 
+                id: 7, 
+                name: "敬请期待", 
+                icon: "🎪", 
+                description: "全新的游戏体验即将上线", 
+                url: "#", 
+                available: false 
+            },
+            { 
+                id: 8, 
+                name: "敬请期待", 
+                icon: "🎭", 
+                description: "全新的游戏体验即将上线", 
+                url: "#", 
+                available: false 
+            }
+        ];
+        
+        // 渲染游戏网格
+        function renderGameGrid() {
+            const gameGrid = document.getElementById('game-grid');
+            let html = '';
+            
+            games.forEach(game => {
+                const comingSoonClass = !game.available ? 'coming-soon' : '';
+                const onclickAttr = game.available ? `onclick="openGame('${game.url}')"` : '';
+                
+                html += `
+                    <div class="game-card ${comingSoonClass}" ${onclickAttr}>
+                        <div class="game-icon">${game.icon}</div>
+                        <div class="game-title">${game.name}</div>
+                        <div class="game-description">${game.description}</div>
+                        ${!game.available ? '<div class="coming-soon-badge">敬请期待</div>' : ''}
+                    </div>
+                `;
+            });
+            
+            gameGrid.innerHTML = html;
+        }
+        
+        // 打开游戏
+        function openGame(url) {
+            window.location.href = url;
+        }
+        
+        // 主题切换功能
+        let currentTheme = 'light';
+        
+        function toggleTheme() {
+            const body = document.body;
+            const themeBtn = document.getElementById('theme-btn');
+            
+            if (currentTheme === 'light') {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                currentTheme = 'dark';
+                themeBtn.innerHTML = '☀️ 浅色模式';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+                currentTheme = 'light';
+                themeBtn.innerHTML = '🌙 深色模式';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const body = document.body;
+            
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-mode');
+                body.classList.remove('light-mode');
+                currentTheme = 'dark';
+                document.getElementById('theme-btn').innerHTML = '☀️ 浅色模式';
+            } else {
+                body.classList.add('light-mode');
+                body.classList.remove('dark-mode');
+                currentTheme = 'light';
+                document.getElementById('theme-btn').innerHTML = '🌙 深色模式';
+            }
+        }
+        
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderGameGrid();
+            loadTheme();
+            
+            // 主题切换按钮事件
+            document.getElementById('theme-btn').addEventListener('click', toggleTheme);
+        });
+    </script>
+</body>
+</html>
