@@ -4,116 +4,154 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>游戏中心 | 在线游戏选择</title>
-    <link rel="stylesheet" href="style.css">
     <style>
-        /* 游戏页面专属样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* ========== 背景图片根据设备自动切换 ========== */
+        body.light-mode {
+            background-color: #ffffff;
+            color: #333333;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        body.dark-mode {
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        /* 手机设备 (宽度 ≤ 768px) */
+        @media (max-width: 768px) {
+            body.light-mode {
+                background-image: url('images/iPhone_background_1.png');
+            }
+            
+            body.dark-mode {
+                background-image: url('images/iPhone_background_2.png');
+            }
+        }
+
+        /* 平板设备 (宽度 769px - 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            body.light-mode {
+                background-image: url('images/iPad_background_1.png');
+            }
+            
+            body.dark-mode {
+                background-image: url('images/iPad_background_2.png');
+            }
+        }
+
+        /* 电脑设备 (宽度 ≥ 1025px) */
+        @media (min-width: 1025px) {
+            body.light-mode {
+                background-image: url('images/PC_background_1.png');
+            }
+            
+            body.dark-mode {
+                background-image: url('images/PC_background_2.png');
+            }
+        }
+
+        /* 背景图片覆盖层（确保文字可读） */
+        body.light-mode::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.85);
+            z-index: -1;
+        }
+
+        body.dark-mode::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+
+        /* ========== 主题切换按钮 ========== */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .theme-btn {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.05);
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        body.dark-mode .theme-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: #e0e0e0;
+        }
+
+        /* 移动端调整主题切换按钮 */
+        @media (max-width: 768px) {
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+            }
+            
+            .theme-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+
+        /* ========== 游戏容器 ========== */
         .games-container {
-            max-width: 900px;
+            max-width: 1200px;
             width: 100%;
             margin: 0 auto;
             animation: fadeInUp 0.6s ease-out;
-        }
-        
-        .games-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        
-        .games-header h1 {
-            font-size: 36px;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .games-header p {
-            color: #666;
-            font-size: 16px;
-        }
-        
-        body.dark-mode .games-header p {
-            color: #b0b0b0;
-        }
-        
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-        
-        .game-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 35px 25px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1;
         }
-        
-        body.dark-mode .game-card {
-            background: rgba(30, 30, 46, 0.95);
-        }
-        
-        .game-card:hover:not(.coming-soon) {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-        }
-        
-        .game-card.coming-soon {
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        
-        .game-card.coming-soon:hover {
-            transform: none;
-        }
-        
-        .game-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-        
-        .game-title {
-            font-size: 22px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #333;
-        }
-        
-        body.dark-mode .game-title {
-            color: #e0e0e0;
-        }
-        
-        .game-description {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.5;
-        }
-        
-        body.dark-mode .game-description {
-            color: #b0b0b0;
-        }
-        
-        .coming-soon-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #ff6b6b;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
+
+        /* 返回按钮 */
         .back-btn {
             display: inline-flex;
             align-items: center;
@@ -130,44 +168,271 @@
             backdrop-filter: blur(10px);
             margin-bottom: 30px;
         }
-        
+
         .back-btn:hover {
             transform: translateX(-5px);
             background: rgba(0, 0, 0, 0.8);
         }
-        
+
         body.dark-mode .back-btn {
             background: rgba(255, 255, 255, 0.2);
         }
-        
+
         body.dark-mode .back-btn:hover {
             background: rgba(255, 255, 255, 0.3);
         }
-        
-        @media (max-width: 600px) {
-            .game-grid {
-                gap: 15px;
+
+        /* 移动端调整返回按钮 */
+        @media (max-width: 768px) {
+            .back-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+                margin-bottom: 20px;
             }
-            
-            .game-card {
-                padding: 25px 15px;
-            }
-            
-            .game-icon {
-                font-size: 48px;
-            }
-            
-            .game-title {
-                font-size: 18px;
-            }
-            
-            .game-description {
-                font-size: 12px;
-            }
-            
+        }
+
+        /* 游戏头部 */
+        .games-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .games-header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #4844FF 0%, #6B66FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .games-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        body.dark-mode .games-header p {
+            color: #b0b0b0;
+        }
+
+        /* 移动端调整标题 */
+        @media (max-width: 768px) {
             .games-header h1 {
                 font-size: 28px;
             }
+            
+            .games-header p {
+                font-size: 14px;
+            }
+        }
+
+        /* ========== 游戏网格 ========== */
+        .game-grid {
+            display: grid;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        /* PC端：4列布局 */
+        @media (min-width: 1025px) {
+            .game-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 25px;
+            }
+        }
+
+        /* 平板端：3列布局 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .game-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+        }
+
+        /* 手机端：2列布局 */
+        @media (max-width: 768px) {
+            .game-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+        }
+
+        /* 小手机：2列但调整内边距 */
+        @media (max-width: 480px) {
+            .game-grid {
+                gap: 12px;
+            }
+        }
+
+        /* 游戏卡片 */
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .game-card {
+            background: rgba(30, 30, 46, 0.95);
+        }
+
+        .game-card:hover:not(.coming-soon) {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-card.coming-soon {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .game-card.coming-soon:hover {
+            transform: none;
+        }
+
+        /* 移动端调整卡片内边距 */
+        @media (max-width: 768px) {
+            .game-card {
+                padding: 20px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-card {
+                padding: 15px 10px;
+            }
+        }
+
+        .game-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        /* 移动端调整图标大小 */
+        @media (max-width: 768px) {
+            .game-icon {
+                font-size: 48px;
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-icon {
+                font-size: 40px;
+                margin-bottom: 12px;
+            }
+        }
+
+        .game-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        body.dark-mode .game-title {
+            color: #e0e0e0;
+        }
+
+        /* 移动端调整标题字体 */
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 16px;
+                margin-bottom: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-title {
+                font-size: 14px;
+            }
+        }
+
+        .game-description {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        body.dark-mode .game-description {
+            color: #b0b0b0;
+        }
+
+        /* 移动端调整描述字体 */
+        @media (max-width: 768px) {
+            .game-description {
+                font-size: 11px;
+            }
+        }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff6b6b;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* 移动端调整敬请期待徽章 */
+        @media (max-width: 768px) {
+            .coming-soon-badge {
+                top: 10px;
+                right: 10px;
+                padding: 3px 8px;
+                font-size: 10px;
+            }
+        }
+
+        /* 页脚 */
+        footer {
+            position: relative;
+            text-align: center;
+            font-size: 12px;
+            margin-top: 40px;
+            padding: 20px 0;
+        }
+
+        body.dark-mode footer {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* 移动端调整页脚 */
+        @media (max-width: 768px) {
+            footer {
+                font-size: 10px;
+                margin-top: 30px;
+                padding: 15px 0;
+            }
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
         }
     </style>
 </head>
@@ -190,8 +455,8 @@
             <!-- 游戏选项将通过JS动态生成 -->
         </div>
         
-        <footer style="position: relative; margin-top: 40px;">
-            <p>© 2024 | 个人主页 | 选择你喜欢的游戏</p>
+        <footer>
+            <p>© 2026 | 游戏中心 | 选择你喜欢的游戏</p>
         </footer>
     </div>
     
@@ -202,8 +467,8 @@
                 id: 1, 
                 name: "立体迷宫", 
                 icon: "🧩", 
-                description: "3D迷宫探险游戏，寻找出口挑战你的空间感！", 
-                url: "games/litimigong.html", 
+                description: "3D迷宫游戏，寻找最长通路，挑战你的空间感！", 
+                url: "games/Maze.html", 
                 available: true 
             },
             { 
@@ -292,24 +557,24 @@
         }
         
         // 主题切换功能
-        let currentTheme = 'light';
+        let currentTheme = 'dark';  // 默认深色模式
         
         function toggleTheme() {
             const body = document.body;
             const themeBtn = document.getElementById('theme-btn');
             
-            if (currentTheme === 'light') {
-                body.classList.remove('light-mode');
-                body.classList.add('dark-mode');
-                currentTheme = 'dark';
-                themeBtn.innerHTML = '☀️ 浅色模式';
-                localStorage.setItem('theme', 'dark');
-            } else {
+            if (currentTheme === 'dark') {
                 body.classList.remove('dark-mode');
                 body.classList.add('light-mode');
                 currentTheme = 'light';
                 themeBtn.innerHTML = '🌙 深色模式';
                 localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                currentTheme = 'dark';
+                themeBtn.innerHTML = '☀️ 浅色模式';
+                localStorage.setItem('theme', 'dark');
             }
         }
         
@@ -317,16 +582,20 @@
             const savedTheme = localStorage.getItem('theme');
             const body = document.body;
             
-            if (savedTheme === 'dark') {
-                body.classList.add('dark-mode');
-                body.classList.remove('light-mode');
-                currentTheme = 'dark';
-                document.getElementById('theme-btn').innerHTML = '☀️ 浅色模式';
-            } else {
+            if (savedTheme === 'light') {
                 body.classList.add('light-mode');
                 body.classList.remove('dark-mode');
                 currentTheme = 'light';
                 document.getElementById('theme-btn').innerHTML = '🌙 深色模式';
+            } else {
+                // 默认深色模式
+                body.classList.add('dark-mode');
+                body.classList.remove('light-mode');
+                currentTheme = 'dark';
+                document.getElementById('theme-btn').innerHTML = '☀️ 浅色模式';
+                if (!savedTheme) {
+                    localStorage.setItem('theme', 'dark');
+                }
             }
         }
         

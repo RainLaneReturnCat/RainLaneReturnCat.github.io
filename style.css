@@ -12,102 +12,60 @@ body {
     align-items: center;
     padding: 20px;
     position: relative;
-    transition: background-color 0.3s ease, color 0.3s ease, background-image 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* 浅色模式 */
+/* ========== 背景图片根据设备自动切换 ========== */
+/* 默认背景（会在媒体查询中覆盖） */
 body.light-mode {
     background-color: #ffffff;
     color: #333333;
-    background-image: url('images/background_1.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
 
-body.light-mode .profile-card {
-    background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
-
-body.light-mode .modal-content {
-    background: white;
-}
-
-body.light-mode .file-item {
-    background: #f8f9fa;
-}
-
-body.light-mode .file-item:hover {
-    background: #e9ecef;
-}
-
-body.light-mode footer {
-    color: rgba(0, 0, 0, 0.6);
-}
-
-/* 深色模式（默认） */
 body.dark-mode {
     background-color: #1a1a2e;
     color: #e0e0e0;
-    background-image: url('images/background_2.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
 
-body.dark-mode .profile-card {
-    background: rgba(30, 30, 46, 0.95);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+/* 手机设备 (宽度 ≤ 768px) */
+@media (max-width: 768px) {
+    body.light-mode {
+        background-image: url('images/iPhone_background_1.png');
+    }
+    
+    body.dark-mode {
+        background-image: url('images/iPhone_background_2.png');
+    }
 }
 
-body.dark-mode #author-name {
-    color: #e0e0e0;
+/* 平板设备 (宽度 769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    body.light-mode {
+        background-image: url('images/iPad_background_1.png');
+    }
+    
+    body.dark-mode {
+        background-image: url('images/iPad_background_2.png');
+    }
 }
 
-body.dark-mode .bio {
-    color: #b0b0b0;
-}
-
-body.dark-mode .stat-number {
-    color: #7c8bff;
-}
-
-body.dark-mode .stat-label {
-    color: #888;
-}
-
-body.dark-mode .modal-content {
-    background: #2a2a3a;
-    color: #e0e0e0;
-}
-
-body.dark-mode .file-item {
-    background: #3a3a4a;
-}
-
-body.dark-mode .file-item:hover {
-    background: #4a4a5a;
-}
-
-body.dark-mode .file-name {
-    color: #e0e0e0;
-}
-
-body.dark-mode .tab-btn {
-    background: #3a3a4a;
-    color: #e0e0e0;
-}
-
-body.dark-mode .tab-btn.active {
-    background: #4844FF;
-    color: white;
-}
-
-body.dark-mode footer {
-    color: rgba(255, 255, 255, 0.6);
+/* 电脑设备 (宽度 ≥ 1025px) */
+@media (min-width: 1025px) {
+    body.light-mode {
+        background-image: url('images/PC_background_1.png');
+    }
+    
+    body.dark-mode {
+        background-image: url('images/PC_background_2.png');
+    }
 }
 
 /* 背景图片覆盖层（确保文字可读） */
@@ -118,7 +76,7 @@ body.light-mode::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.7);
     z-index: -1;
 }
 
@@ -133,22 +91,20 @@ body.dark-mode::before {
     z-index: -1;
 }
 
+/* ========== 主容器 ========== */
 .container {
     max-width: 500px;
     width: 100%;
+    margin: 0 auto;
     animation: fadeInUp 0.6s ease-out;
     position: relative;
     z-index: 1;
 }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+/* 平板和电脑端容器宽度保持一致（与初版相同） */
+@media (min-width: 769px) {
+    .container {
+        max-width: 500px;
     }
 }
 
@@ -183,8 +139,22 @@ body.dark-mode .theme-btn {
     color: #e0e0e0;
 }
 
-/* 个人资料卡片 */
+/* 移动端调整主题切换按钮位置 */
+@media (max-width: 768px) {
+    .theme-toggle {
+        top: 10px;
+        right: 10px;
+    }
+    
+    .theme-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
+
+/* ========== 个人资料卡片 ========== */
 .profile-card {
+    background: rgba(255, 255, 255, 0.95);
     border-radius: 30px;
     padding: 40px 30px;
     text-align: center;
@@ -192,11 +162,30 @@ body.dark-mode .theme-btn {
     backdrop-filter: blur(10px);
     margin-bottom: 30px;
     transition: transform 0.3s ease, background 0.3s ease;
-    position: relative;
 }
 
 .profile-card:hover {
     transform: translateY(-5px);
+}
+
+body.dark-mode .profile-card {
+    background: rgba(30, 30, 46, 0.95);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* 手机端调整卡片内边距和底部间距（加大竖直距离） */
+@media (max-width: 768px) {
+    .profile-card {
+        padding: 30px 20px;
+        margin-bottom: 40px;  /* 加大与按钮的距离 */
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-card {
+        padding: 25px 20px;
+        margin-bottom: 45px;  /* 小手机进一步加大距离 */
+    }
 }
 
 .avatar-container {
@@ -219,25 +208,74 @@ body.dark-mode .theme-btn {
     transform: scale(1.05);
 }
 
+/* 移动端调整头像大小 */
+@media (max-width: 768px) {
+    .avatar {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .avatar {
+        width: 90px;
+        height: 90px;
+    }
+}
+
 #author-name {
     font-size: 28px;
     margin-bottom: 10px;
     font-weight: 600;
 }
 
+body.dark-mode #author-name {
+    color: #e0e0e0;
+}
+
+/* 移动端调整标题大小 */
+@media (max-width: 768px) {
+    #author-name {
+        font-size: 24px;
+    }
+}
+
 .bio {
+    color: #666;
     font-size: 16px;
     line-height: 1.6;
     margin-bottom: 25px;
     white-space: pre-line;
 }
 
+body.dark-mode .bio {
+    color: #b0b0b0;
+}
+
+/* 移动端调整简介字体 */
+@media (max-width: 768px) {
+    .bio {
+        font-size: 14px;
+    }
+}
+
 .stats {
     display: flex;
     justify-content: center;
-    gap: 40px;
+    gap: 100px;
     padding-top: 20px;
     border-top: 1px solid #e0e0e0;
+}
+
+body.dark-mode .stats {
+    border-top-color: #444;
+}
+
+/* 移动端调整统计信息间距 */
+@media (max-width: 768px) {
+    .stats {
+        gap: 30px;
+    }
 }
 
 .stat-item {
@@ -251,13 +289,24 @@ body.dark-mode .theme-btn {
     color: #4844FF;
 }
 
+/* 移动端调整统计数字大小 */
+@media (max-width: 768px) {
+    .stat-number {
+        font-size: 20px;
+    }
+}
+
 .stat-label {
     font-size: 12px;
     color: #999;
     margin-top: 5px;
 }
 
-/* 按钮区域 */
+body.dark-mode .stat-label {
+    color: #888;
+}
+
+/* ========== 按钮区域 ========== */
 .buttons-container {
     display: flex;
     gap: 20px;
@@ -265,8 +314,24 @@ body.dark-mode .theme-btn {
     flex-wrap: wrap;
 }
 
+/* 平板和电脑端按钮保持水平排列 */
+@media (min-width: 769px) {
+    .buttons-container {
+        flex-direction: row;
+        gap: 20px;
+    }
+}
+
+/* 手机端按钮水平排列，但调整间距 */
+@media (max-width: 768px) {
+    .buttons-container {
+        flex-direction: row;
+        gap: 15px;
+    }
+}
+
 .action-btn {
-    flex: 1;
+    flex: 0 1 auto;
     min-width: 150px;
     padding: 18px 25px;
     border: none;
@@ -291,14 +356,39 @@ body.dark-mode .theme-btn {
     transform: translateY(0);
 }
 
-/* 谱面文件按钮 - 使用新的主题色 #4844FF 渐变 */
+/* 平板和电脑端按钮大小保持一致 */
+@media (min-width: 769px) {
+    .action-btn {
+        min-width: 150px;
+        padding: 18px 25px;
+        font-size: 18px;
+    }
+}
+
+/* 手机端按钮稍小 */
+@media (max-width: 768px) {
+    .action-btn {
+        min-width: 130px;
+        padding: 15px 20px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .action-btn {
+        min-width: 120px;
+        padding: 12px 18px;
+        font-size: 14px;
+    }
+}
+
 .sheet-btn {
-    background: linear-gradient(135deg, #7000FF 0%, #4844FF 100%);
+    background: linear-gradient(135deg, #4844FF 0%, #6B66FF 100%);
     color: white;
 }
 
 .game-btn {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: linear-gradient(90deg,  #00C8FE 0%, #4facfe 60%);
     color: white;
 }
 
@@ -306,11 +396,24 @@ body.dark-mode .theme-btn {
     font-size: 24px;
 }
 
+/* 移动端调整按钮图标大小 */
+@media (max-width: 768px) {
+    .btn-icon {
+        font-size: 20px;
+    }
+}
+
 .btn-text {
     font-size: 18px;
 }
 
-/* 模态框 */
+@media (max-width: 768px) {
+    .btn-text {
+        font-size: 16px;
+    }
+}
+
+/* ========== 模态框样式 ========== */
 .modal {
     display: none;
     position: fixed;
@@ -320,53 +423,151 @@ body.dark-mode .theme-btn {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    animation: fadeIn 0.3s ease;
+    transition: background-color 0.3s ease;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
+/* 模态框内容 */
 .modal-content {
     background-color: white;
-    margin: 10% auto;
     padding: 0;
-    width: 90%;
-    max-width: 600px;
     border-radius: 20px;
-    animation: slideDown 0.3s ease;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    overflow: hidden;
 }
 
-@keyframes slideDown {
-    from {
-        transform: translateY(-50px);
+/* 手机端模态框 (宽度 ≤ 768px) */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 90%;
+        max-width: 500px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) translateY(20px);
         opacity: 0;
     }
-    to {
-        transform: translateY(0);
+    
+    .modal.show .modal-content {
+        transform: translate(-50%, -50%) translateY(0);
         opacity: 1;
     }
 }
 
+/* 平板端模态框 (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .modal-content {
+        width: 85%;
+        max-width: 700px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.95);
+        opacity: 0;
+    }
+    
+    .modal.show .modal-content {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+/* 电脑端模态框 (宽度 ≥ 1025px) */
+@media (min-width: 1025px) {
+    .modal-content {
+        width: 80%;
+        max-width: 800px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.95);
+        opacity: 0;
+    }
+    
+    .modal.show .modal-content {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+body.dark-mode .modal-content {
+    background: #2a2a3a;
+}
+
+/* 模态框头部 - 保留平滑过渡 */
 .modal-header {
     padding: 20px 25px;
-    background: linear-gradient(135deg, #4844FF 0%, #6B66FF 100%);
     color: white;
     border-radius: 20px 20px 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* ZIP 模式下的头部渐变 */
+.modal-header.zip-mode {
+    background: linear-gradient(135deg, #4844FF 0%, #6B66FF 100%);
+    box-shadow: 0 4px 15px rgba(72, 68, 255, 0.3);
+}
+
+/* PEZ 模式下的头部渐变 */
+.modal-header.pez-mode {
+    background: linear-gradient(135deg, #4facfe 0%, #00C8FE 100%);
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+}
+/* 添加流动光效 */
+.modal-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.3), 
+        transparent);
+    transition: left 0.6s ease;
+    pointer-events: none;
+}
+
+.modal-header.zip-mode::before {
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.4), 
+        transparent);
+}
+
+.modal-header.pez-mode::before {
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.4), 
+        transparent);
+}
+
+.modal.show .modal-header::before {
+    left: 100%;
+}
+
+/* 平板和电脑端调整模态框头部内边距 */
+@media (min-width: 769px) {
+    .modal-header {
+        padding: 25px 30px;
+    }
+    
+    .modal-header h2 {
+        font-size: 24px;
+    }
 }
 
 .modal-header h2 {
     font-size: 20px;
     margin: 0;
+    position: relative;
+    z-index: 1;
 }
 
 .close {
@@ -375,42 +576,161 @@ body.dark-mode .theme-btn {
     cursor: pointer;
     transition: transform 0.2s;
     line-height: 1;
+    position: relative;
+    z-index: 1;
 }
 
 .close:hover {
     transform: scale(1.1);
 }
 
-/* 文件标签页 */
+/* ========== 文件标签页 - 矩形样式（无圆角） ========== */
 .file-tabs {
     display: flex;
     padding: 0;
     background: #f0f0f0;
-    border-radius: 10px 10px 0 0;
     overflow: hidden;
+}
+
+body.dark-mode .file-tabs {
+    background: #3a3a4a;
 }
 
 .tab-btn {
     flex: 1;
     padding: 12px;
     border: none;
-    background: #e0e0e0;
     cursor: pointer;
     font-size: 16px;
     font-weight: 500;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
+    border-radius: 0 !important;
+    position: relative;
 }
 
-.tab-btn.active {
-    background: #4844FF;
-    color: white;
+/* ZIP 标签默认样式 */
+.tab-btn[data-type="zip"] {
+    background: #e0e0e0;
+    color: #4844FF;
 }
 
-/* 文件列表 */
+/* PEZ 标签默认样式 */
+.tab-btn[data-type="pez"] {
+    background: #e0e0e0;
+    color: #4facfe;
+}
+
+/* 深色模式默认样式 */
+body.dark-mode .tab-btn[data-type="zip"] {
+    background: #3a3a4a;
+    color: #6B66FF;
+}
+
+body.dark-mode .tab-btn[data-type="pez"] {
+    background: #3a3a4a;
+    color: #4facfe;
+}
+
+/* ZIP 标签高亮样式 */
+.tab-btn[data-type="zip"].active {
+    background: #4844FF !important;
+    color: white !important;
+    box-shadow: 0 -2px 0 0 #4844FF inset, 0 2px 8px rgba(72, 68, 255, 0.3);
+}
+
+/* PEZ 标签高亮样式 */
+.tab-btn[data-type="pez"].active {
+    background: #4facfe !important;
+    color: white !important;
+    box-shadow: 0 -2px 0 0 #4facfe inset, 0 2px 8px rgba(79, 172, 254, 0.3);
+}
+
+/* 悬停效果 - 非高亮状态 */
+.tab-btn[data-type="zip"]:hover:not(.active) {
+    background: #d0d0ff;
+    transform: translateY(-1px);
+}
+
+.tab-btn[data-type="pez"]:hover:not(.active) {
+    background: #d0f0ff;
+    transform: translateY(-1px);
+}
+
+/* 深色模式悬停效果 */
+body.dark-mode .tab-btn[data-type="zip"]:hover:not(.active) {
+    background: #4a4a6a;
+}
+
+body.dark-mode .tab-btn[data-type="pez"]:hover:not(.active) {
+    background: #3a6a8a;
+}
+
+/* 点击波纹效果 */
+.tab-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+    pointer-events: none;
+}
+
+.tab-btn:active::after {
+    width: 100px;
+    height: 100px;
+    opacity: 0;
+    transition: 0s;
+}
+
+/* 平板和电脑端调整标签页按钮大小 */
+@media (min-width: 769px) {
+    .tab-btn {
+        padding: 15px;
+        font-size: 18px;
+    }
+}
+
+/* 移动端调整标签页按钮大小 */
+@media (max-width: 768px) {
+    .tab-btn {
+        padding: 10px;
+        font-size: 14px;
+    }
+}
+
+/* ========== 文件列表 ========== */
 .file-list {
     padding: 20px 25px;
-    max-height: 400px;
     overflow-y: auto;
+}
+
+/* 手机端文件列表高度 */
+@media (max-width: 768px) {
+    .file-list {
+        padding: 15px;
+        max-height: 400px;
+    }
+}
+
+/* 平板端文件列表更大 */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .file-list {
+        padding: 25px 30px;
+        max-height: 500px;
+    }
+}
+
+/* 电脑端文件列表最大 */
+@media (min-width: 1025px) {
+    .file-list {
+        padding: 30px 35px;
+        max-height: 600px;
+    }
 }
 
 .file-item {
@@ -424,8 +744,37 @@ body.dark-mode .theme-btn {
     transition: all 0.2s ease;
 }
 
+body.dark-mode .file-item {
+    background: #3a3a4a;
+}
+
 .file-item:hover {
     transform: translateX(5px);
+}
+
+/* 平板和电脑端文件项更大内边距 */
+@media (min-width: 769px) {
+    .file-item {
+        padding: 15px 20px;
+        margin-bottom: 12px;
+    }
+    
+    .file-name {
+        font-size: 16px;
+    }
+}
+
+/* 移动端文件项垂直布局 */
+@media (max-width: 768px) {
+    .file-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .file-item:hover {
+        transform: none;
+    }
 }
 
 .file-name {
@@ -434,6 +783,10 @@ body.dark-mode .theme-btn {
     gap: 10px;
     font-size: 14px;
     flex: 1;
+}
+
+body.dark-mode .file-name {
+    color: #e0e0e0;
 }
 
 .file-name span:first-child {
@@ -456,12 +809,31 @@ body.dark-mode .theme-btn {
     transform: scale(1.05);
 }
 
+/* 平板和电脑端下载按钮更大 */
+@media (min-width: 769px) {
+    .download-btn {
+        padding: 8px 20px;
+        font-size: 14px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+}
+
+/* 移动端下载按钮占满宽度 */
+@media (max-width: 768px) {
+    .download-btn {
+        width: 100%;
+        padding: 8px;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+}
 .empty-message {
     text-align: center;
     color: #999;
     padding: 40px;
 }
 
+/* 页脚 */
 footer {
     position: fixed;
     bottom: 20px;
@@ -472,32 +844,301 @@ footer {
     z-index: 1;
 }
 
-/* 响应式设计 */
-@media (max-width: 600px) {
-    .profile-card {
-        padding: 30px 20px;
+body.dark-mode footer {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* 移动端调整 footer */
+@media (max-width: 768px) {
+    footer {
+        font-size: 10px;
+        bottom: 10px;
+    }
+}
+
+/* 动画 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+}
+
+/* ========== 美化弹窗滚动条 ========== */
+
+/* ========== 动态主题色 - 根据当前标签页切换 ========== */
+
+/* 滚动条基础样式 */
+.file-list::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    transition: all 0.3s ease;
+}
+
+.file-list::-webkit-scrollbar-track {
+    background: #e8e8e8;
+    border-radius: 4px;
+    margin: 8px 0;
+    transition: background 0.3s ease;
+}
+
+.file-list::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background-size: 200% 200%;
+}
+
+.file-list::-webkit-scrollbar-thumb:hover {
+    transform: scaleX(1.1);
+}
+
+/* ZIP 模式下的滚动条颜色 */
+.file-list.zip-mode::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #4844FF, #6B66FF);
+}
+
+.file-list.zip-mode::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #6B66FF, #4844FF);
+}
+
+/* PEZ 模式下的滚动条颜色 */
+.file-list.pez-mode::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #4facfe, #00C8FE);
+}
+
+.file-list.pez-mode::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #00C8FE, #4facfe);
+}
+
+/* Firefox 滚动条颜色动态切换 */
+.file-list {
+    scrollbar-width: thin;
+    transition: scrollbar-color 0.4s ease;
+}
+
+.file-list.zip-mode {
+    scrollbar-color: #4844FF #e8e8e8;
+}
+
+.file-list.pez-mode {
+    scrollbar-color: #4facfe #e8e8e8;
+}
+
+/* 深色模式下的动态滚动条 */
+body.dark-mode .file-list.zip-mode {
+    scrollbar-color: #4844FF #2a2a3a;
+}
+
+body.dark-mode .file-list.pez-mode {
+    scrollbar-color: #4facfe #2a2a3a;
+}
+
+body.dark-mode .file-list::-webkit-scrollbar-track {
+    background: #2a2a3a;
+}
+
+/* Firefox 深色模式 */
+body.dark-mode .file-list {
+    scrollbar-color: #4844FF #2a2a3a;
+}
+
+/* ========== 响应式调整 ========== */
+@media (max-width: 768px) {
+    .file-list::-webkit-scrollbar {
+        width: 6px;
     }
     
-    .avatar {
-        width: 100px;
-        height: 100px;
+    .file-list::-webkit-scrollbar-track {
+        margin: 4px 0;
     }
-    
-    #author-name {
-        font-size: 24px;
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .file-list::-webkit-scrollbar {
+        width: 10px;
     }
-    
-    .action-btn {
-        padding: 15px 20px;
-        min-width: 130px;
+}
+
+@media (min-width: 1025px) {
+    .file-list::-webkit-scrollbar {
+        width: 12px;
     }
-    
-    .btn-text {
-        font-size: 16px;
+}
+
+/* ========== 动态主题色 - 根据当前标签页切换 ========== */
+
+/* 滚动条基础样式 */
+.file-list::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.file-list::-webkit-scrollbar-track {
+    background: #e8e8e8;
+    border-radius: 4px;
+    margin: 8px 0;
+}
+
+.file-list::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    /* 移除 transition，避免中间过渡状态 */
+}
+
+.file-list::-webkit-scrollbar-thumb:hover {
+    transform: scaleX(1.1);
+}
+
+/* ZIP 模式下的滚动条颜色 */
+.file-list.zip-mode::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #4844FF, #6B66FF);
+}
+
+.file-list.zip-mode::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #6B66FF, #4844FF);
+}
+
+/* PEZ 模式下的滚动条颜色 */
+.file-list.pez-mode::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #4facfe, #00C8FE);
+}
+
+.file-list.pez-mode::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #00C8FE, #4facfe);
+}
+
+/* Firefox 滚动条颜色动态切换 */
+.file-list {
+    scrollbar-width: thin;
+}
+
+.file-list.zip-mode {
+    scrollbar-color: #4844FF #e8e8e8;
+}
+
+.file-list.pez-mode {
+    scrollbar-color: #4facfe #e8e8e8;
+}
+
+/* 深色模式下的动态滚动条 */
+body.dark-mode .file-list.zip-mode {
+    scrollbar-color: #4844FF #2a2a3a;
+}
+
+body.dark-mode .file-list.pez-mode {
+    scrollbar-color: #4facfe #2a2a3a;
+}
+
+/* ========== 下载按钮动态颜色 ========== */
+
+.download-btn {
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    position: relative;
+    overflow: hidden;
+    /* 移除 transition，避免中间过渡状态 */
+}
+
+/* ZIP 模式下的下载按钮 */
+.file-list.zip-mode .download-btn {
+    background: linear-gradient(135deg, #4844FF, #6B66FF);
+    color: white;
+    box-shadow: 0 2px 5px rgba(72, 68, 255, 0.3);
+}
+
+.file-list.zip-mode .download-btn:hover {
+    background: linear-gradient(135deg, #6B66FF, #4844FF);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(72, 68, 255, 0.4);
+}
+
+/* PEZ 模式下的下载按钮 */
+.file-list.pez-mode .download-btn {
+    background: linear-gradient(90deg, #4facfe 0%, #00C8FE 100%);
+    color: white;
+    box-shadow: 0 2px 5px rgba(79, 172, 254, 0.3);
+}
+
+.file-list.pez-mode .download-btn:hover {
+    background: linear-gradient(90deg, #00C8FE, #4facfe);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
+}
+
+/* 添加按钮点击波纹效果 */
+.download-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+    pointer-events: none;
+}
+
+.download-btn:active::after {
+    width: 100px;
+    height: 100px;
+    opacity: 0;
+    transition: 0s;
+}
+/* 下载按钮动画 */
+@keyframes btnGlowZip {
+    0% {
+        background: linear-gradient(135deg, #cccccc, #dddddd);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
-    
-    .modal-content {
-        margin: 20% auto;
-        width: 95%;
+    100% {
+        background: linear-gradient(135deg, #4844FF, #6B66FF);
+        box-shadow: 0 2px 5px rgba(72, 68, 255, 0.3);
     }
+}
+
+@keyframes btnGlowPez {
+    0% {
+        background: linear-gradient(135deg, #cccccc, #dddddd);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    100% {
+        background: linear-gradient(135deg, #4facfe, #00C8FE);
+        box-shadow: 0 2px 5px rgba(79, 172, 254, 0.3);
+    }
+}
+
+/* 添加按钮点击波纹效果 */
+.download-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+    pointer-events: none;
+}
+
+.download-btn:active::after {
+    width: 100px;
+    height: 100px;
+    opacity: 0;
+    transition: 0s;
 }
