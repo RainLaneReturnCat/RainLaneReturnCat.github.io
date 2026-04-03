@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>数字吞噬者 - 协同移动策略游戏</title>
+    <style>
+        * {
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1a472a 0%, #0e2a1a 100%);
+            font-family: 'Segoe UI', 'Roboto', 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* 主容器 */
+        .game-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 48px;
+            padding: 20px;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-panel {
+            background: #fef3e2;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: inset 0 0 0 1px rgba(255,255,200,0.8), 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        /* 信息栏 */
+        .info-bar {
+            background: #2c1e12;
+            color: #ffefcf;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-weight: bold;
+            border-bottom: 3px solid #e6b17e;
+        }
+
+        .info-item {
+            background: #4a3520;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.3), 0 1px 0 #d4b48c;
+        }
+
+        .info-item span {
+            color: #ffd966;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        /* 棋盘区 */
+        .board-wrapper {
+            padding: 20px;
+            overflow-x: auto;
+            background: #ecd9b4;
+        }
+
+        .board {
+            display: grid;
+            background: #b87c4f;
+            gap: 3px;
+            padding: 6px;
+            border-radius: 20px;
+            box-shadow: inset 0 0 0 2px #6b3e1c, 0 6px 12px black;
+            margin: 0 auto;
+        }
+
+        .cell {
+            background: #fffaec;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1rem;
+            font-family: monospace;
+            color: #2d2b1f;
+            aspect-ratio: 1 / 1;
+            min-width: 48px;
+            min-height: 48px;
+            transition: all 0.05s linear;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1), 0 1px 0 white;
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* 选中棋子高亮 */
+        .cell.selected {
+            background: #f9d56e;
+            box-shadow: 0 0 0 3px gold, inset 0 0 0 2px #a55800;
+            transform: scale(0.98);
+        }
+
+        /* 可移动棋子特殊标记 */
+        .cell.movable-piece {
+            background: #c9e9ff;
+            font-weight: bold;
+        }
+
+        /* 空位(被吃掉后) */
+        .cell.empty {
+            background: #9b7b5c;
+            color: #6a4c2c;
+            box-shadow: inset 0 0 0 1px #4e2f18;
+        }
+
+        /* 操作栏 */
+        .action-bar {
+            background: #2c1e12;
+            padding: 16px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            border-top: 2px solid #e6b17e;
+        }
+
+        button {
+            background: #ffcf9a;
+            border: none;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 60px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 0 3px 0 #8b5a2b;
+            color: #3b280f;
+            font-family: inherit;
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #8b5a2b;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+        .direction-panel {
+            display: flex;
+            gap: 8px;
+            background: #4a3520;
+            padding: 5px 12px;
+            border-radius: 60px;
+        }
+
+        .dir-btn {
+            background: #5c3e21;
+            color: white;
+            font-size: 1.4rem;
+            padding: 6px 16px;
+            box-shadow: none;
+        }
+
+        /* 主界面模态框 */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .main-menu {
+            background: #fff1e0;
+            border-radius: 48px;
+            padding: 32px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 25px 40px black;
+        }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .history-item {
+            background: #e9dbc9;
+            margin: 8px 0;
+            padding: 8px 12px;
+            border-radius: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .size-control {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        h2 {
+            margin: 0 0 12px 0;
+            color: #5e2e14;
+        }
+
+        hr {
+            margin: 16px 0;
+        }
+
+        .rule-text {
+            background: #d9c2a7;
+            border-radius: 24px;
+            padding: 12px;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+    // ---------- 核心游戏逻辑 ----------
+    class GameEngine {
+        constructor(rows, cols, initialGrid = null) {
+            this.rows = rows;
+            this.cols = cols;
+            // grid存储每个格子的数值(null表示空)
+            if (initialGrid) {
+                this.grid = initialGrid.map(row => [...row]);
+            } else {
+                this.grid = this.generateRandomGrid(rows, cols);
+            }
+            this.selectedPieces = [];     // 存储选中的棋子坐标 {r,c}
+            this.fixedPieces = false;      // 是否已经确认选择 (锁定移动棋子)
+            this.moveHistory = [];          // 存储历史状态 {grid, selectedPieces, score, stepCount}
+            this.score = 0;                // 总得分(吞噬数值累计)
+            this.stepCount = 0;
+        }
+
+        generateRandomGrid(rows, cols) {
+            let grid = [];
+            for (let i = 0; i < rows; i++) {
+                grid[i] = [];
+                for (let j = 0; j < cols; j++) {
+                    grid[i][j] = Math.floor(Math.random() * 100); // 00-99
+                }
+            }
+            return grid;
+        }
+
+        // 保存当前状态用于撤销
+        saveToHistory() {
+            const gridCopy = this.grid.map(row => [...row]);
+            this.moveHistory.push({
+                grid: gridCopy,
+                selectedPieces: this.selectedPieces.map(p => ({...p})),
+                score: this.score,
+                stepCount: this.stepCount
+            });
+        }
+
+        undo() {
+            if (this.moveHistory.length === 0) return false;
+            const last = this.moveHistory.pop();
+            this.grid = last.grid.map(row => [...row]);
+            this.selectedPieces = last.selectedPieces.map(p => ({...p}));
+            this.score = last.score;
+            this.stepCount = last.stepCount;
+            return true;
+        }
+
+        // 重置棋盘到初始(保留原始尺寸,重新生成随机数)
+        resetToNewRandom() {
+            this.grid = this.generateRandomGrid(this.rows, this.cols);
+            this.selectedPieces = [];
+            this.fixedPieces = false;
+            this.moveHistory = [];
+            this.score = 0;
+            this.stepCount = 0;
+        }
+
+        // 重置盘面 (但保持尺寸，重新生成随机，清除选择)
+        fullReset() {
+            this.resetToNewRandom();
+        }
+
+        // 选择棋子 (仅当未确认选择时)
+        toggleSelectPiece(row, col) {
+            if (this.fixedPieces) return false;
+            if (this.grid[row][col] === null) return false; // 空棋子不可选
+            const index = this.selectedPieces.findIndex(p => p.r === row && p.c === col);
+            if (index !== -1) {
+                this.selectedPieces.splice(index, 1);
+            } else {
+                if (this.selectedPieces.length >= 5) return false;
+                this.selectedPieces.push({r: row, c: col});
+            }
+            return true;
+        }
+
+        // 确认选择五枚棋子
+        confirmSelection() {
+            if (this.selectedPieces.length !== 5) return false;
+            this.fixedPieces = true;
+            this.saveToHistory(); // 记录初始状态(选择后)
+            return true;
+        }
+
+        // 移动尝试: dir = 'up','down','left','right'
+        // 协同移动规则: 每个选中的棋子尝试向同一方向移动一格(边界限制)
+        // 移动时, 如果目标格有棋子(非空)，且至少有一位数字相同(原数字与目标数字比较十位或个位相同)，则吃掉，被吃棋子消失，原棋子数值增加目标数值(>=100则只保留后两位)
+        // 若不能吃(目标有棋子但数字无对应相同)则此棋子移动失败(卡住) => 不动。
+        // 空位则直接移动进入。两两棋子之间也可发生: 比如A移动到B的位置(B原本是可选棋子或普通棋子)同时发生吞噬；需要按顺序处理？
+        // 但游戏规则: 协同移动同时进行，但是相互移动中如果棋子A移动到B的位置，应该基于移动前的状态来计算能否吞噬，避免互相影响。
+        // 实现方法: 先计算每个棋子将要移动到的目标位置，以及是否吞噬（基于移动前棋盘），然后统一更新棋盘。
+        move(dir) {
+            if (!this.fixedPieces) return false;
+
+            // 保存当前状态以便撤销
+            this.saveToHistory();
+
+            let deltaRow = 0, deltaCol = 0;
+            if (dir === 'up') deltaRow = -1;
+            else if (dir === 'down') deltaRow = 1;
+            else if (dir === 'left') deltaCol = -1;
+            else if (dir === 'right') deltaCol = 1;
+
+            const moves = []; // 存储每个棋子移动信息 {from, to, canEat, targetVal, sourceVal}
+            const newGrid = this.grid.map(row => [...row]); // 先深拷贝，在副本上修改，再统一提交
+            // 但为了判断移动合法性及吞噬，需要原棋盘数据
+            const oldGrid = this.grid;
+
+            // 按顺序记录每个可移动棋子的目标
+            for (let piece of this.selectedPieces) {
+                const r = piece.r, c = piece.c;
+                const val = oldGrid[r][c];
+                if (val === null) continue; // 已被吃(理论上可选棋子不会被吃, 但历史恢复安全起见)
+                const nr = r + deltaRow, nc = c + deltaCol;
+                // 边界外 无法移动
+                if (nr < 0 || nr >= this.rows || nc < 0 || nc >= this.cols) {
+                    continue;
+                }
+                const targetVal = oldGrid[nr][nc];
+                // 目标为空: 直接移动
+                if (targetVal === null) {
+                    moves.push({from: {r,c}, to: {r:nr,c:nc}, sourceVal: val, targetVal: null, willEat: false});
+                } 
+                // 目标有棋子
+                else {
+                    // 判断是否可以吞噬：至少有一位数字相同 (十位或个位)
+                    const srcTens = Math.floor(val / 10);
+                    const srcUnits = val % 10;
+                    const tgtTens = Math.floor(targetVal / 10);
+                    const tgtUnits = targetVal % 10;
+                    if (srcTens === tgtTens || srcUnits === tgtUnits) {
+                        // 可以吃掉
+                        let newVal = val + targetVal;
+                        if (newVal >= 100) newVal = newVal % 100;
+                        moves.push({from: {r,c}, to: {r:nr,c:nc}, sourceVal: val, targetVal: targetVal, willEat: true, newVal: newVal});
+                    } else {
+                        // 无法吞噬，卡住不动
+                        continue;
+                    }
+                }
+            }
+
+            // 检测移动是否有重叠冲突: 多个棋子移动到同一个格子? 按规则如果都吃同一个或移动到同一个位置，处理: 需要独立处理合并？
+            // 游戏协同移动允许同时发生，但如果A和B移动到同一格，逻辑上属于互斥，需要设计合并逻辑: 谁吃谁？为避免复杂, 规定同一目标格最多一个移动指令，若多个则全部取消本次移动(或按官方规则？) 最好简单禁止冲突移动，为了保证体验，冲突时整个移动无效(回滚)
+            const targetMap = new Map(); // key "r,c" 记录移动后的占位
+            let conflict = false;
+            for (let mv of moves) {
+                const key = `${mv.to.r},${mv.to.c}`;
+                if (targetMap.has(key)) {
+                    conflict = true;
+                    break;
+                }
+                targetMap.set(key, mv);
+            }
+            if (conflict) {
+                // 移动冲突撤销本次移动（弹出历史）
+                this.undo();
+                return false;
+            }
+
+            // 另外要处理 移动中“吃棋子” 的得分累加, 并且被吃的棋子不能同时作为移动源 (如果某个选中的棋子被另一个选中的棋子吃掉，如何处理？)
+            // 移动集合中 如果 to 坐标恰好是某个选中的棋子 from 坐标 并且该from棋子也准备移动，但根据冲突检测，from坐标的移动目标是to，而to原来的棋子若也移动，这没问题。
+            // 但若选中棋子A移动到选中棋子B的原位置，而B也要移动, 根据移动前棋盘二者独立: A的目标为B的位置，B的目标为别的格子，由于原棋盘上B存在，移动时A吞噬B，但是B是否还会移动？依据规则：被吃掉的棋子消失，就不该移动了。处理: 在更新前标记哪些源会被吃掉
+            const eatenSet = new Set(); // 记录被吃掉的坐标（基于旧坐标）
+            for (let mv of moves) {
+                if (mv.willEat) {
+                    eatenSet.add(`${mv.to.r},${mv.to.c}`);
+                }
+            }
+            // 被吃的棋子若是选中的棋子之一，那它将不再移动
+            const finalMoves = moves.filter(mv => !eatenSet.has(`${mv.from.r},${mv.from.c}`));
+            
+            // 应用移动: 清空所有原位置，然后更新新位置数值
+            // 先清除所有移动源位置（设置为null）注意: 但有些源没有被移动也没有被吃保留
+            const tempGrid = oldGrid.map(row => [...row]);
+            // 清除移动源
+            for (let mv of finalMoves) {
+                tempGrid[mv.from.r][mv.from.c] = null;
+            }
+            // 计算得分，并放置新棋子
+            let addedScore = 0;
+            for (let mv of finalMoves) {
+                if (mv.willEat) {
+                    const newVal = mv.newVal;
+                    addedScore += mv.targetVal; // 被吃棋子数值累加得分
+                    tempGrid[mv.to.r][mv.to.c] = newVal;
+                } else {
+                    // 移动到空位
+                    tempGrid[mv.to.r][mv.to.c] = mv.sourceVal;
+                }
+            }
+            // 更新网格
+            this.grid = tempGrid;
+            this.score += addedScore;
+            this.stepCount++;
+
+            // 更新选中的棋子新坐标 (已经移动的棋子位置发生变化)
+            const newSelected = [];
+            for (let piece of this.selectedPieces) {
+                const moved = finalMoves.find(mv => mv.from.r === piece.r && mv.from.c === piece.c);
+                if (moved) {
+                    // 移动后的新位置
+                    newSelected.push({r: moved.to.r, c: moved.to.c});
+                } else {
+                    // 没移动或因为被吃导致消失? 如果被吃了则不应保留选中，但该棋子已消失, 规则上移动棋子如果被其他棋子吃则消失且不再是移动单位？
+                    // 如果被吃掉的棋子是选中的, 它将从selected移除。游戏规则: 移动棋子也可能互相吞噬, 被吃掉则不再属于可控棋子。
+                    // 检查该棋子是否被吃掉(位于eatenSet)
+                    const isEaten = [...finalMoves].some(mv => mv.willEat && mv.to.r === piece.r && mv.to.c === piece.c);
+                    if (!isEaten && this.grid[piece.r] && this.grid[piece.r][piece.c] !== null) {
+                        newSelected.push({r: piece.r, c: piece.c});
+                    }
+                }
+            }
+            this.selectedPieces = newSelected;
+            // 如果可移动棋子数量变为0，游戏无法再移动（玩家可以提交）
+            if (this.selectedPieces.length === 0) {
+                this.fixedPieces = false; // 锁定解除但无棋子, 实际上提示结束
+            }
+            return true;
+        }
+
+        // 获取当前棋盘状态用于渲染
+        getBoard() {
+            return this.grid;
+        }
+
+        getSelected() {
+            return this.selectedPieces;
+        }
+
+        isSelectionLocked() {
+            return this.fixedPieces;
+        }
+
+        getScore() {
+            return this.score;
+        }
+
+        getSteps() {
+            return this.stepCount;
+        }
+
+        // 检查是否有可移动棋子且存在至少一个可能移动方向（简易辅助，不用复杂）
+    }
+
+    // ---------- UI 控制 ----------
+    let currentGame = null;
+    let timerSeconds = 0;
+    let timerInterval = null;
+    let isGameActive = false;      // 是否对局中(主界面关闭且游戏初始化)
+    let currentRows = 15, currentCols = 15;
+    let historyRecords = [];       // 存储历史 {rows, cols, timeUsed, steps, score, snapshotGrid}
+
+    // DOM 元素挂载点
+    const app = document.getElementById('app');
+
+    function loadHistoryFromLocal() {
+        const stored = localStorage.getItem('numEatHistory');
+        if (stored) {
+            try {
+                historyRecords = JSON.parse(stored);
+            } catch(e) {}
+        }
+    }
+
+    function saveHistoryToLocal() {
+        localStorage.setItem('numEatHistory', JSON.stringify(historyRecords));
+    }
+
+    // 渲染主界面
+    function showMainMenu() {
+        if (timerInterval) clearInterval(timerInterval);
+        isGameActive = false;
+        renderMainMenuView();
+    }
+
+    function renderMainMenuView() {
+        const sizeRow = currentRows;
+        const sizeCol = currentCols;
+        let historyHtml = '';
+        historyRecords.forEach((rec, idx) => {
+            historyHtml += `
+                <div class="history-item">
+                    <span>${rec.rows}x${rec.cols} | ${rec.timeUsed}s | 步数:${rec.steps} | 得分:${rec.score}</span>
+                    <div>
+                        <button class="view-history-btn" data-idx="${idx}">查看</button>
+                        <button class="del-history-btn" data-idx="${idx}">删除</button>
+                    </div>
+                </div>
+            `;
+        });
+        const menuHtml = `
+            <div class="overlay" id="mainMenuOverlay">
+                <div class="main-menu">
+                    <h1>🍖 数字吞噬者</h1>
+                    <div class="size-control">
+                        <label>宽: <input type="number" id="colInput" min="10" max="30" value="${currentCols}"></label>
+                        <label>高: <input type="number" id="rowInput" min="10" max="30" value="${currentRows}"></label>
+                        <button id="applySizeBtn">调整大小</button>
+                    </div>
+                    <button id="startGameBtn">✨ 开始游戏 ✨</button>
+                    <hr>
+                    <details>
+                        <summary>📜 规则介绍</summary>
+                        <div class="rule-text">
+                            • 棋盘m×n，每个棋子数值00~99。<br>
+                            • 开局先选择5枚棋子作为可移动单位。<br>
+                            • 移动时全体协同朝一个方向移动，若目标格棋子有至少一位数字相同，则吞噬它并加数值(取后两位)，被吞噬棋子消失，得分增加其数值。<br>
+                            • 若不能吞噬则卡住不动，相互之间也能吞噬。<br>
+                            • 目标: 吞噬更多棋子获得高分。<br>
+                            • 可撤销，提交结束对局。
+                        </div>
+                    </details>
+                    <h3>📋 历史对局</h3>
+                    <div class="history-list" id="historyList">
+                        ${historyHtml || '<div>暂无记录</div>'}
+                    </div>
+                    <button id="closeMenuBtn">关闭菜单</button>
+                </div>
+            </div>
+        `;
+        app.innerHTML = menuHtml;
+        document.getElementById('startGameBtn').onclick = () => startGameFromMenu();
+        document.getElementById('applySizeBtn').onclick = () => {
+            let newCol = parseInt(document.getElementById('colInput').value);
+            let newRow = parseInt(document.getElementById('rowInput').value);
+            if (isNaN(newCol)) newCol = currentCols;
+            if (isNaN(newRow)) newRow = currentRows;
+            newCol = Math.min(30, Math.max(10, newCol));
+            newRow = Math.min(30, Math.max(10, newRow));
+            currentRows = newRow;
+            currentCols = newCol;
+            renderMainMenuView();
+        };
+        document.getElementById('closeMenuBtn').onclick = () => {
+            // 若没有游戏则关闭菜单但无游戏
+            if(!currentGame) showMainMenu();
+            else location.reload(); // 简单重置
+        };
+        document.querySelectorAll('.view-history-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                const idx = btn.dataset.idx;
+                const rec = historyRecords[idx];
+                alert(`初始盘面预览:\n${rec.snapshotGrid.map(row=>row.map(v=>v===null?'空':v.toString().padStart(2,'0')).join(' ')).join('\n')}\n用时:${rec.timeUsed}s 步数:${rec.steps} 得分:${rec.score}`);
+            };
+        });
+        document.querySelectorAll('.del-history-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                const idx = btn.dataset.idx;
+                historyRecords.splice(idx,1);
+                saveHistoryToLocal();
+                renderMainMenuView();
+            };
+        });
+    }
+
+    function startGameFromMenu() {
+        if (timerInterval) clearInterval(timerInterval);
+        currentGame = new GameEngine(currentRows, currentCols);
+        timerSeconds = 0;
+        isGameActive = true;
+        renderGameView();
+        startTimer();
+    }
+
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            if (isGameActive && currentGame) {
+                timerSeconds++;
+                updateInfoBar();
+            }
+        }, 1000);
+    }
+
+    function updateInfoBar() {
+        const timeSpan = document.getElementById('gameTimer');
+        const stepsSpan = document.getElementById('stepCount');
+        const scoreSpan = document.getElementById('totalScore');
+        if(timeSpan) timeSpan.innerText = timerSeconds;
+        if(stepSpan) stepsSpan.innerText = currentGame.getSteps();
+        if(scoreSpan) scoreSpan.innerText = currentGame.getScore();
+    }
+
+    function renderGameView() {
+        const board = currentGame.getBoard();
+        const rows = currentGame.rows, cols = currentGame.cols;
+        const selected = currentGame.getSelected();
+        const locked = currentGame.isSelectionLocked();
+        let gridStyle = `grid-template-columns: repeat(${cols}, minmax(55px, 70px));`;
+        let cellsHtml = '';
+        for(let i=0;i<rows;i++){
+            for(let j=0;j<cols;j++){
+                const val = board[i][j];
+                const isEmpty = (val === null);
+                const isSelected = !locked && selected.some(s => s.r===i && s.c===j);
+                const isMovable = locked && selected.some(s => s.r===i && s.c===j);
+                let classes = 'cell';
+                if(isEmpty) classes += ' empty';
+                if(isSelected) classes += ' selected';
+                if(isMovable && !isEmpty) classes += ' movable-piece';
+                const displayVal = isEmpty ? '⚫' : val.toString().padStart(2,'0');
+                cellsHtml += `<div class="${classes}" data-row="${i}" data-col="${j}">${displayVal}</div>`;
+            }
+        }
+        const gameHtml = `
+            <div class="game-container">
+                <div class="game-panel">
+                    <div class="info-bar">
+                        <div class="info-item">⏱️ 用时 <span id="gameTimer">0</span> s</div>
+                        <div class="info-item">🚶 步数 <span id="stepCount">0</span></div>
+                        <div class="info-item">🏆 得分 <span id="totalScore">0</span></div>
+                    </div>
+                    <div class="board-wrapper">
+                        <div class="board" style="${gridStyle}">
+                            ${cellsHtml}
+                        </div>
+                    </div>
+                    <div class="action-bar">
+                        <button id="undoBtn" ${!locked ? 'disabled' : ''}>↩️ 撤销</button>
+                        <button id="confirmSelectBtn" ${locked ? 'disabled' : ''}>✅ 确认选择</button>
+                        <button id="resetBtn">🔄 重置</button>
+                        <button id="submitBtn" ${!locked ? 'disabled' : ''}>🏁 提交</button>
+                        <button id="exitBtn">🚪 退出</button>
+                        <div class="direction-panel">
+                            <button class="dir-btn" data-dir="up">▲</button>
+                            <button class="dir-btn" data-dir="left">◀</button>
+                            <button class="dir-btn" data-dir="down">▼</button>
+                            <button class="dir-btn" data-dir="right">▶</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        app.innerHTML = gameHtml;
+        // 绑定事件
+        if(!locked){
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.onclick = (e) => {
+                    const row = parseInt(cell.dataset.row);
+                    const col = parseInt(cell.dataset.col);
+                    currentGame.toggleSelectPiece(row,col);
+                    renderGameView();
+                };
+            });
+        }
+        document.getElementById('confirmSelectBtn').onclick = () => {
+            if(currentGame.confirmSelection()){
+                renderGameView();
+            } else alert('请选择5枚棋子');
+        };
+        document.getElementById('undoBtn').onclick = () => {
+            if(currentGame.undo()) renderGameView(); else alert('无历史步骤');
+        };
+        document.getElementById('resetBtn').onclick = () => {
+            if(confirm('重置盘面将丢失进度，确定吗?')){
+                currentGame.fullReset();
+                timerSeconds = 0;
+                renderGameView();
+            }
+        };
+        document.getElementById('submitBtn').onclick = () => {
+            if(confirm('提交本局成绩？')){
+                const record = {
+                    rows: currentGame.rows, cols: currentGame.cols,
+                    timeUsed: timerSeconds, steps: currentGame.getSteps(),
+                    score: currentGame.getScore(),
+                    snapshotGrid: currentGame.getBoard().map(row=>[...row])
+                };
+                historyRecords.unshift(record);
+                saveHistoryToLocal();
+                clearInterval(timerInterval);
+                showMainMenu();
+            }
+        };
+        document.getElementById('exitBtn').onclick = () => {
+            clearInterval(timerInterval);
+            showMainMenu();
+        };
+        document.querySelectorAll('.dir-btn').forEach(btn => {
+            btn.onclick = () => {
+                if(currentGame.isSelectionLocked()){
+                    currentGame.move(btn.dataset.dir);
+                    renderGameView();
+                    updateInfoBar();
+                }
+            };
+        });
+        // 键盘控制
+        window.onkeydown = (e) => {
+            if(!isGameActive || !currentGame.isSelectionLocked()) return;
+            const key = e.key;
+            let dir = null;
+            if(key === 'ArrowUp' || key === 'w') dir='up';
+            else if(key === 'ArrowDown' || key === 's') dir='down';
+            else if(key === 'ArrowLeft' || key === 'a') dir='left';
+            else if(key === 'ArrowRight' || key === 'd') dir='right';
+            if(dir) { currentGame.move(dir); renderGameView(); updateInfoBar(); e.preventDefault();}
+        };
+        updateInfoBar();
+    }
+
+    loadHistoryFromLocal();
+    showMainMenu();
+</script>
+</body>
+</html>

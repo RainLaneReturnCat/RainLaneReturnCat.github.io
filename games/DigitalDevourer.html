@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>数字吞噬者 - 协同移动策略游戏</title>
+    <style>
+        /* 样式与您提供的文件完全相同，此处省略以节省篇幅 */
+        /* 保持原有所有样式不变 */
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(145deg, #192E46 0%, #0E1B2A 100%);
+            font-family: 'Segoe UI', 'Poppins', 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* 主界面样式 */
+        .main-menu-container {
+            background: #6F4E30;
+            border-radius: 48px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.1);
+            padding: 20px;
+        }
+
+        .main-menu-view {
+            background: #FCDC9F;
+            border-radius: 32px;
+            padding: 20px;
+            text-align: center;
+            min-width: 320px;
+            box-shadow: inset 0 0 0 2px #fef0d8, 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .game-title {
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: #ffdd99;
+            text-shadow: 4px 4px 0 #8b5a2b;
+            margin-bottom: 20px;
+            letter-spacing: 4px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .menu-buttons button {
+            background: #ffc857;
+            border: none;
+            font-size: 1.3rem;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            box-shadow: 0 5px 0 #a05e15;
+            font-family: inherit;
+            color: #3b280f;
+        }
+
+        .menu-buttons button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #a05e15;
+        }
+
+        .size-control {
+            background: #ecd9b4;
+            border-radius: 40px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #ffefcf;
+        }
+
+        .slider-item {
+            background: #fff6e8;
+            padding: 12px 20px;
+	    width: 450px;
+            border-radius: 40px;
+            margin-bottom: 15px;
+            box-shadow: inset 0 0 0 1px #ffefcf, 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .slider-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-weight: bold;
+            color: #5a3e1b;
+            margin-bottom: 8px;
+        }
+
+        .slider-header label {
+            font-size: 1rem;
+        }
+
+        .slider-value {
+            background: #ffb347;
+            padding: 4px 12px;
+            border-radius: 30px;
+            color: #2d2b1f;
+            font-size: 0.9rem;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: #e1cfaa;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type="range"]:focus {
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffb347;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: 0.1s;
+        }
+
+        /* 游戏界面样式 */
+        .game-wrapper {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 48px;
+            padding: 20px;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5);
+            width: 95vw;
+            max-width: 1200px;
+            height: calc(100vh - 40px);
+            max-height: 900px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-panel {
+            background: #fef3e2;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: inset 0 0 0 1px rgba(255,255,200,0.8), 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .info-bar {
+            background: #2c1e12;
+            color: #ffefcf;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-weight: bold;
+            border-bottom: 3px solid #e6b17e;
+            flex-shrink: 0;
+        }
+
+        .info-item {
+            background: #4a3520;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 1rem;
+        }
+
+        .info-item span {
+            color: #ffd966;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .board-area {
+            padding: 20px;
+            background: #ecd9b4;
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .board-scroll-container {
+            overflow: auto;
+            width: 100%;
+            height: 100%;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .board-wrapper {
+            display: inline-block;
+        }
+
+        .board-scroll-container.center-mode {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .board {
+            display: inline-grid;
+            background: #b87c4f;
+            border-radius: 20px;
+            box-shadow: inset 0 0 0 2px #6b3e1c, 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .cell {
+            background: #fffaec;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: monospace;
+            color: #2d2b1f;
+            transition: all 0.05s linear;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1), 0 1px 0 white;
+            cursor: pointer;
+        }
+
+        .cell.empty {
+            background: #9b7b5c;
+            color: #6a4c2c;
+            box-shadow: inset 0 0 0 1px #4e2f18;
+            cursor: default;
+        }
+
+        .cell.selected {
+            background: #f9d56e;
+            box-shadow: 0 0 0 3px gold, inset 0 0 0 2px #a55800;
+            transform: scale(0.96);
+        }
+
+        .cell.movable-piece {
+            background: #c9e9ff;
+            font-weight: bold;
+        }
+
+        .action-bar {
+            background: #2c1e12;
+            padding: 12px 20px;
+            flex-shrink: 0;
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .action-row:last-child {
+            margin-bottom: 0;
+        }
+
+        button {
+            background: #ffcf9a;
+            border: none;
+            font-weight: bold;
+            padding: 8px 18px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 3px 0 #8b5a2b;
+            color: #3b280f;
+            font-family: inherit;
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #8b5a2b;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+        .dir-btn {
+            background: #5c3e21;
+            color: white;
+            font-size: 1.2rem;
+            padding: 6px 18px;
+        }
+
+        .zoom-control {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #4a3520;
+            padding: 4px 12px;
+            border-radius: 40px;
+        }
+
+        .zoom-control button {
+            background: #ffaa55;
+            padding: 4px 12px;
+            font-size: 1.2rem;
+            box-shadow: none;
+        }
+
+        /* 自定义弹窗样式 */
+        .custom-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .dialog-content {
+            background: linear-gradient(135deg, #fff5e8, #fffaf0);
+            border-radius: 48px;
+            padding: 28px 32px;
+            min-width: 320px;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+            border: 1px solid #ffdd99;
+            animation: slideUp 0.2s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .dialog-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+
+        .dialog-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #5a3e1b;
+            margin-bottom: 12px;
+        }
+
+        .dialog-message {
+            font-size: 1rem;
+            color: #6c4e2e;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .dialog-btn {
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.1s;
+            border: none;
+        }
+
+        .dialog-btn.confirm {
+            background: #ffb347;
+            color: #3b280f;
+            box-shadow: 0 3px 0 #a05e15;
+        }
+
+        .dialog-btn.confirm:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #a05e15;
+        }
+
+        .dialog-btn.cancel {
+            background: #9b7b5c;
+            color: white;
+            box-shadow: 0 3px 0 #5a3e1b;
+        }
+
+        .dialog-btn.cancel:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #5a3e1b;
+        }
+
+	/* 美化滚动条 - 适用于整个页面和所有容器 */
+	::-webkit-scrollbar {
+	    width: 10px;
+	    height: 10px;
+	}
+
+	::-webkit-scrollbar-track {
+	    background: #3e2a1f;
+	    border-radius: 10px;
+	    margin: 4px;
+	}
+
+	::-webkit-scrollbar-thumb {
+	    background: #ffb347;
+	    border-radius: 10px;
+	    transition: all 0.2s ease;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+	    background: #ff9f1a;
+	}
+
+	/* 棋盘区域滚动条特殊样式 */
+	.board-scroll-container::-webkit-scrollbar-track {
+	    background: #c7a66b;
+	    border-radius: 10px;
+	}
+
+	.board-scroll-container::-webkit-scrollbar-thumb {
+	    background: #8b5a2b;
+	    border-radius: 10px;
+	}
+
+	.board-scroll-container::-webkit-scrollbar-thumb:hover {
+	    background: #6b3e1c;
+	}
+
+	/* 历史记录弹窗滚动条 */
+	.history-modal-scroll::-webkit-scrollbar-track {
+	    background: #e9dbc9;
+	    border-radius: 10px;
+	}
+
+	.history-modal-scroll::-webkit-scrollbar-thumb {
+	    background: #c7a66b;
+	    border-radius: 10px;
+	}
+
+	.history-modal-scroll::-webkit-scrollbar-thumb:hover {
+	    background: #b58d4f;
+	}
+
+	/* 主界面历史记录列表滚动条 */
+	.history-list::-webkit-scrollbar-track {
+	    background: #3e2a1f;
+	    border-radius: 10px;
+	}
+
+	.history-list::-webkit-scrollbar-thumb {
+	    background: #ffb347;
+	    border-radius: 10px;
+	}
+
+	/* Firefox 滚动条样式 */
+	* {
+	    scrollbar-width: thin;
+	    scrollbar-color: #ffb347 #3e2a1f;
+	}
+
+	.board-scroll-container {
+	    scrollbar-width: thin;
+	    scrollbar-color: #8b5a2b #c7a66b;
+	}
+
+	.history-modal-scroll {
+	    scrollbar-width: thin;
+	    scrollbar-color: #c7a66b #e9dbc9;
+	}
+
+        /* 模态框样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.25);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #fef5e8, #fffaf0);
+            border-radius: 48px;
+            padding: 24px;
+            max-width: 85vw;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+	    font-family: 'Segoe UI', 'Poppins', 'Roboto', 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Noto Sans CJK SC', sans-serif;
+        }
+
+        .history-modal-scroll {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 12px;
+            margin-bottom: 20px;
+            min-height: 0;
+        }
+
+        .history-record-item {
+            background: linear-gradient(135deg, #fff2e0, #fff8ef);
+            margin: 12px 0;
+            padding: 12px 18px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            border: 1px solid #e1cfaa;
+        }
+
+        .history-record-info {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #4a2e12;
+        }
+
+        .history-record-actions button {
+            font-size: 0.8rem;
+            padding: 6px 16px;
+            margin-left: 10px;
+            background: #6c4e2e;
+            color: white;
+            box-shadow: 0 2px 0 #4a2e12;
+        }
+
+        .modal-button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+            padding-top: 15px;
+            border-top: 2px solid #e1cfaa;
+        }
+
+        .preview-board {
+            display: inline-grid;
+            gap: 3px;
+            background: #b87c4f;
+            padding: 12px;
+            border-radius: 20px;
+            margin: 10px auto;
+        }
+
+        .preview-cell {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            background: #fffaec;
+            border-radius: 8px;
+        }
+
+        .rule-text {
+            background: #d9c2a7;
+            border-radius: 24px;
+            padding: 16px;
+            text-align: left;
+            font-size: 1.1rem;
+	    line-height: 1.8;
+	    font-family: 'Segoe UI', 'Poppins', 'Roboto', 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Noto Sans CJK SC', sans-serif;
+        }
+
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 12px;
+            color: #7a6233;
+        }
+
+@media (max-width: 480px) {
+        .slider-item {
+            background: #fff6e8;
+            padding: 12px 20px;
+	    width: 240px;
+            border-radius: 40px;
+            margin-bottom: 15px;
+            box-shadow: inset 0 0 0 1px #ffefcf, 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .info-item {
+            background: #4a3520;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+        }
+
+        .info-item span {
+            color: #ffd966;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .action-row:last-child {
+            margin-bottom: 0;
+        }
+
+        button {
+            background: #ffcf9a;
+            border: none;
+            font-weight: bold;
+            padding: 8px 18px;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 3px 0 #8b5a2b;
+            color: #3b280f;
+            font-family: inherit;
+        }
+
+}
+
+    </style>
+</head>
+<body>
+<div id="appRoot"></div>
+
+<script>
+    // ---------- 自定义弹窗函数 ----------
+    function showDialog(message, title = "提示", type = "info") {
+        return new Promise((resolve) => {
+            const dialog = document.createElement("div");
+            dialog.className = "custom-dialog";
+            
+            const icon = type === "success" ? "🎉" : type === "error" ? "⚠️" : "ℹ️";
+            
+            dialog.innerHTML = `
+                <div class="dialog-content">
+                    <div class="dialog-icon">${icon}</div>
+                    <div class="dialog-title">${title}</div>
+                    <div class="dialog-message">${message}</div>
+                    <div class="dialog-buttons">
+                        <button class="dialog-btn confirm">确定</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(dialog);
+            
+            const confirmBtn = dialog.querySelector(".dialog-btn.confirm");
+            confirmBtn.onclick = () => {
+                dialog.remove();
+                resolve(true);
+            };
+        });
+    }
+    
+    function showConfirm(message, title = "确认") {
+        return new Promise((resolve) => {
+            const dialog = document.createElement("div");
+            dialog.className = "custom-dialog";
+            
+            dialog.innerHTML = `
+                <div class="dialog-content">
+                    <div class="dialog-icon">❓</div>
+                    <div class="dialog-title">${title}</div>
+                    <div class="dialog-message">${message}</div>
+                    <div class="dialog-buttons">
+                        <button class="dialog-btn cancel">取消</button>
+                        <button class="dialog-btn confirm">确定</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(dialog);
+            
+            const confirmBtn = dialog.querySelector(".dialog-btn.confirm");
+            const cancelBtn = dialog.querySelector(".dialog-btn.cancel");
+            
+            confirmBtn.onclick = () => {
+                dialog.remove();
+                resolve(true);
+            };
+            cancelBtn.onclick = () => {
+                dialog.remove();
+                resolve(false);
+            };
+        });
+    }
+
+    // ---------- 游戏引擎 ----------
+    class GameEngine {
+        constructor(rows, cols, presetBoard = null) {
+            this.rows = rows;
+            this.cols = cols;
+            if (presetBoard) {
+                this.grid = presetBoard.map(row => [...row]);
+                this.initialGridSnapshot = presetBoard.map(row => [...row]);
+            } else {
+                this.grid = this.generateRandomGrid(rows, cols);
+                this.initialGridSnapshot = this.grid.map(row => [...row]);
+            }
+            this.selectedPieces = [];
+            this.confirmed = false;
+            this.historyStack = [];
+            this.score = 0;
+            this.stepCount = 0;
+        }
+
+        generateRandomGrid(rows, cols) {
+            let grid = [];
+            for (let i = 0; i < rows; i++) {
+                grid[i] = [];
+                for (let j = 0; j < cols; j++) {
+                    grid[i][j] = Math.floor(Math.random() * 100);
+                }
+            }
+            return grid;
+        }
+
+        saveToHistory() {
+            this.historyStack.push({
+                grid: this.grid.map(row => [...row]),
+                selectedPieces: this.selectedPieces.map(p => ({...p})),
+                score: this.score,
+                stepCount: this.stepCount,
+                confirmed: this.confirmed
+            });
+        }
+
+        undo() {
+            if (this.historyStack.length === 0) return false;
+            const last = this.historyStack.pop();
+            this.grid = last.grid.map(row => [...row]);
+            this.selectedPieces = last.selectedPieces.map(p => ({...p}));
+            this.score = last.score;
+            this.stepCount = last.stepCount;
+            this.confirmed = last.confirmed;
+            return true;
+        }
+
+        resetToInitial() {
+            this.grid = this.initialGridSnapshot.map(row => [...row]);
+            this.selectedPieces = [];
+            this.confirmed = false;
+            this.historyStack = [];
+            this.score = 0;
+            this.stepCount = 0;
+        }
+
+        newGame() {
+            this.grid = this.generateRandomGrid(this.rows, this.cols);
+            this.initialGridSnapshot = this.grid.map(row => [...row]);
+            this.selectedPieces = [];
+            this.confirmed = false;
+            this.historyStack = [];
+            this.score = 0;
+            this.stepCount = 0;
+        }
+
+        toggleSelect(row, col) {
+            if (this.confirmed) return false;
+            if (this.grid[row][col] === null) return false;
+            const idx = this.selectedPieces.findIndex(p => p.r === row && p.c === col);
+            if (idx !== -1) {
+                this.selectedPieces.splice(idx, 1);
+            } else {
+                if (this.selectedPieces.length >= 5) return false;
+                this.selectedPieces.push({r: row, c: col});
+            }
+            return true;
+        }
+
+        confirmSelection() {
+            if (this.selectedPieces.length !== 5) return false;
+            this.confirmed = true;
+            this.saveToHistory();
+            return true;
+        }
+
+        // 检查两个数字是否可以吞噬（对应位相同：十位对十位 或 个位对个位）
+        canEat(attacker, target) {
+            if (target === null) return true; // 空位可以直接移动
+            const aTens = Math.floor(attacker / 10);
+            const aOnes = attacker % 10;
+            const tTens = Math.floor(target / 10);
+            const tOnes = target % 10;
+            return (aTens === tTens || aOnes === tOnes);
+        }
+
+move(dir) {
+    if (!this.confirmed) return false;
+    this.saveToHistory();
+
+    let dr = 0, dc = 0;
+    if (dir === 'up') dr = -1;
+    else if (dir === 'down') dr = 1;
+    else if (dir === 'left') dc = -1;
+    else if (dir === 'right') dc = 1;
+
+    const oldGrid = this.grid;
+    const newGrid = oldGrid.map(row => [...row]);
+    
+    // 记录所有选中的棋子位置
+    const selectedSet = new Set();
+    for (let p of this.selectedPieces) {
+        selectedSet.add(`${p.r},${p.c}`);
+    }
+    
+    // 存储每个棋子的移动意图
+    const moveInfos = [];
+    
+    // 第一步：计算每个棋子的移动意图
+    for (let piece of this.selectedPieces) {
+        const r = piece.r, c = piece.c;
+        const val = oldGrid[r][c];
+        if (val === null) continue;
+        
+        const nr = r + dr, nc = c + dc;
+        
+        // 边界检查
+        if (nr < 0 || nr >= this.rows || nc < 0 || nc >= this.cols) {
+            continue;
+        }
+        
+        const targetVal = oldGrid[nr][nc];
+        const isTargetSelected = selectedSet.has(`${nr},${nc}`);
+        
+        // 空位
+        if (targetVal === null) {
+            moveInfos.push({
+                from: {r, c}, to: {r: nr, c: nc},
+                fromVal: val, toVal: null,
+                isEat: false, isTargetSelected: false,
+                newVal: val
+            });
+        }
+        // 目标是被选中的棋子
+        else if (isTargetSelected) {
+            moveInfos.push({
+                from: {r, c}, to: {r: nr, c: nc},
+                fromVal: val, toVal: targetVal,
+                isEat: false, isTargetSelected: true,
+                newVal: val
+            });
+        }
+        // 目标是静止棋子
+        else {
+            const srcTens = Math.floor(val / 10);
+            const srcOnes = val % 10;
+            const tgtTens = Math.floor(targetVal / 10);
+            const tgtOnes = targetVal % 10;
+            
+            if (srcTens === tgtTens || srcOnes === tgtOnes) {
+                moveInfos.push({
+                    from: {r, c}, to: {r: nr, c: nc},
+                    fromVal: val, toVal: targetVal,
+                    isEat: true, isTargetSelected: false,
+                    newVal: (val + targetVal) % 100
+                });
+            }
+            // 数字不匹配：不添加
+        }
+    }
+    
+    // 如果没有棋子能移动，直接返回
+    if (moveInfos.length === 0) {
+        this.undo();
+        return false;
+    }
+    
+    // 第二步：按移动方向排序（右边的先移动）
+    moveInfos.sort((a, b) => {
+        if (dir === 'right') return b.to.c - a.to.c;
+        if (dir === 'left') return a.to.c - b.to.c;
+        if (dir === 'up') return a.to.r - b.to.r;
+        if (dir === 'down') return b.to.r - a.to.r;
+        return 0;
+    });
+    
+    // 第三步：检查目标格子冲突
+    const targetSet = new Set();
+    for (let info of moveInfos) {
+        const key = `${info.to.r},${info.to.c}`;
+        if (targetSet.has(key)) {
+            this.undo();
+            return false;
+        }
+        targetSet.add(key);
+    }
+    
+    // 第四步：确定哪些棋子能真正移动（从最右边的棋子开始检查）
+    // 创建一个 Map 记录最终有效的移动
+    const finalMoves = new Map(); // key: 源位置, value: 移动信息
+    
+    // 从右向左处理（因为已经排序，右边的在前）
+    for (let info of moveInfos) {
+        // 如果是目标是选中的棋子
+        if (info.isTargetSelected) {
+            const targetKey = `${info.to.r},${info.to.c}`;
+            // 检查目标棋子是否已经确定可以移动（已经在 finalMoves 中）
+            const targetWillMove = finalMoves.has(targetKey);
+            if (targetWillMove) {
+                finalMoves.set(`${info.from.r},${info.from.c}`, info);
+            }
+            // 如果目标不会移动，则不能进入
+        } else {
+            // 空位或静止棋子，可以直接移动
+            finalMoves.set(`${info.from.r},${info.from.c}`, info);
+        }
+    }
+    
+    if (finalMoves.size === 0) {
+        this.undo();
+        return false;
+    }
+    
+    // 第五步：应用移动
+    for (let [fromKey, info] of finalMoves) {
+        newGrid[info.from.r][info.from.c] = null;
+    }
+    
+    let addedScore = 0;
+    for (let [fromKey, info] of finalMoves) {
+        newGrid[info.to.r][info.to.c] = info.newVal;
+        if (info.isEat) {
+            addedScore += info.toVal;
+        }
+    }
+    
+    // 更新游戏状态
+    this.grid = newGrid;
+    this.score += addedScore;
+    this.stepCount++;
+    
+    // 第六步：更新选中的棋子新坐标
+    const newSelected = [];
+    for (let piece of this.selectedPieces) {
+        const fromKey = `${piece.r},${piece.c}`;
+        const movedInfo = finalMoves.get(fromKey);
+        
+        if (movedInfo) {
+            newSelected.push({r: movedInfo.to.r, c: movedInfo.to.c});
+        } else if (newGrid[piece.r] && newGrid[piece.r][piece.c] !== null) {
+            newSelected.push({r: piece.r, c: piece.c});
+        }
+    }
+    
+    this.selectedPieces = newSelected;
+    if (this.selectedPieces.length === 0) {
+        this.confirmed = false;
+    }
+    
+    return true;
+}
+
+        getBoard() { return this.grid; }
+        getSelected() { return this.selectedPieces; }
+        isConfirmed() { return this.confirmed; }
+        getScore() { return this.score; }
+        getSteps() { return this.stepCount; }
+        getInitialSnapshot() { return this.initialGridSnapshot.map(row => [...row]); }
+    }
+
+    // ---------- 历史记录管理 ----------
+    const STORAGE_KEY = "NumEaterHistory";
+
+    function loadHistory() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        return stored ? JSON.parse(stored) : [];
+    }
+
+    function saveHistory(history) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    }
+
+    function addOrUpdateHistoryRecord(rows, cols, timeSec, steps, score, boardSnapshot) {
+        let history = loadHistory();
+        
+        const existingIdx = history.findIndex(r => r.rows === rows && r.cols === cols && 
+            JSON.stringify(r.boardSnapshot) === JSON.stringify(boardSnapshot));
+        
+        if (existingIdx !== -1) {
+            if (score > history[existingIdx].score) {
+                history[existingIdx] = { 
+                    ...history[existingIdx], 
+                    time: timeSec, 
+                    steps: steps, 
+                    score: score, 
+                    date: new Date().toLocaleString() 
+                };
+                saveHistory(history);
+            }
+            return;
+        }
+        
+        const newRecord = {
+            id: Date.now(),
+            rows, cols, time: timeSec, steps, score,
+            boardSnapshot: boardSnapshot.map(row => [...row]),
+            date: new Date().toLocaleString()
+        };
+        history.unshift(newRecord);
+        if (history.length > 30) history.pop();
+        saveHistory(history);
+    }
+
+    function deleteHistoryRecord(id) {
+        let history = loadHistory();
+        history = history.filter(rec => rec.id !== id);
+        saveHistory(history);
+        return history;
+    }
+
+    // ---------- UI 管理 ----------
+    let currentGame = null;
+    let timerSeconds = 0;
+    let timerInterval = null;
+    let isGameActive = false;
+    let currentRows = 15, currentCols = 15;
+    
+    let currentZoom = 1.0;
+    const MIN_ZOOM = 0.5;
+    const MAX_ZOOM = 2.0;
+    const ZOOM_STEP = 0.05;
+    const BASE_CELL_SIZE = 52;
+    const GAP_SIZE = 3;
+    const PADDING_SIZE = 12;
+
+    const app = document.getElementById('appRoot');
+
+    function stopTimer() {
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    }
+
+    function startTimer() {
+        if (timerInterval) stopTimer();
+        timerInterval = setInterval(() => {
+            if (isGameActive && currentGame) {
+                timerSeconds++;
+                updateInfoUI();
+            }
+        }, 1000);
+    }
+
+    function updateInfoUI() {
+        const timerSpan = document.getElementById('gameTimer');
+        const stepsSpan = document.getElementById('stepCount');
+        const scoreSpan = document.getElementById('totalScore');
+        if (timerSpan) timerSpan.innerText = timerSeconds;
+        if (stepsSpan) stepsSpan.innerText = currentGame?.getSteps() || 0;
+        if (scoreSpan) scoreSpan.innerText = currentGame?.getScore() || 0;
+        const selectedSpan = document.getElementById('selectedCount');
+        if (selectedSpan) selectedSpan.innerText = currentGame?.getSelected().length || 0;
+    }
+
+    function getBoardActualSize() {
+        if (!currentGame) return { width: 0, height: 0 };
+        const cellSize = BASE_CELL_SIZE * currentZoom;
+        const rows = currentGame.rows, cols = currentGame.cols;
+        const width = cols * cellSize + (cols - 1) * GAP_SIZE + PADDING_SIZE * 2;
+        const height = rows * cellSize + (rows - 1) * GAP_SIZE + PADDING_SIZE * 2;
+        return { width, height };
+    }
+    
+    function getContainerSize() {
+        const scrollContainer = document.getElementById('scrollContainer');
+        if (!scrollContainer) return { width: 0, height: 0 };
+        return { width: scrollContainer.clientWidth, height: scrollContainer.clientHeight };
+    }
+    
+    function shouldCenterMode() {
+        const boardSize = getBoardActualSize();
+        const containerSize = getContainerSize();
+        return boardSize.width <= containerSize.width;
+    }
+    
+    function adjustScrollContainerAlignment() {
+        const scrollContainer = document.getElementById('scrollContainer');
+        if (!scrollContainer) return;
+        const needCenter = shouldCenterMode();
+        if (needCenter) {
+            if (!scrollContainer.classList.contains('center-mode')) {
+                scrollContainer.classList.add('center-mode');
+                scrollContainer.scrollLeft = 0;
+            }
+        } else {
+            if (scrollContainer.classList.contains('center-mode')) {
+                scrollContainer.classList.remove('center-mode');
+            }
+        }
+    }
+    
+    let savedScrollRatio = null;
+
+    function saveScrollPosition() {
+        const scrollContainer = document.getElementById('scrollContainer');
+        if (!scrollContainer) return;
+        if (!scrollContainer.classList.contains('center-mode')) {
+            const maxScrollLeft = Math.max(0, scrollContainer.scrollWidth - scrollContainer.clientWidth);
+            const maxScrollTop = Math.max(0, scrollContainer.scrollHeight - scrollContainer.clientHeight);
+            savedScrollRatio = {
+                left: maxScrollLeft > 0 ? scrollContainer.scrollLeft / maxScrollLeft : 0.5,
+                top: maxScrollTop > 0 ? scrollContainer.scrollTop / maxScrollTop : 0.5
+            };
+        } else {
+            savedScrollRatio = null;
+        }
+    }
+
+    function restoreScrollPosition() {
+        const scrollContainer = document.getElementById('scrollContainer');
+        if (!scrollContainer || !savedScrollRatio) return;
+        if (!scrollContainer.classList.contains('center-mode')) {
+            requestAnimationFrame(() => {
+                const maxScrollLeft = Math.max(0, scrollContainer.scrollWidth - scrollContainer.clientWidth);
+                const maxScrollTop = Math.max(0, scrollContainer.scrollHeight - scrollContainer.clientHeight);
+                scrollContainer.scrollLeft = savedScrollRatio.left * maxScrollLeft;
+                scrollContainer.scrollTop = savedScrollRatio.top * maxScrollTop;
+                savedScrollRatio = null;
+            });
+        } else {
+            savedScrollRatio = null;
+        }
+    }
+
+    function centerBoardInScroll() {
+        const scrollContainer = document.getElementById('scrollContainer');
+        if (!scrollContainer) return;
+        const boardSize = getBoardActualSize();
+        const containerSize = getContainerSize();
+        if (scrollContainer.classList.contains('center-mode')) {
+            scrollContainer.scrollLeft = 0;
+            scrollContainer.scrollTop = 0;
+        } else {
+            if (boardSize.width > containerSize.width) {
+                scrollContainer.scrollLeft = Math.max(0, (boardSize.width - containerSize.width) / 2);
+            }
+            if (boardSize.height > containerSize.height) {
+                scrollContainer.scrollTop = Math.max(0, (boardSize.height - containerSize.height) / 2);
+            }
+        }
+    }
+
+    function renderBoardWithZoom() {
+        if (!currentGame) return;
+        
+        const board = currentGame.getBoard();
+        const rows = currentGame.rows, cols = currentGame.cols;
+        const selected = currentGame.getSelected();
+        const confirmed = currentGame.isConfirmed();
+        
+        const cellSize = BASE_CELL_SIZE * currentZoom;
+        const boardWidth = cols * cellSize + (cols - 1) * GAP_SIZE + PADDING_SIZE * 2;
+        const boardHeight = rows * cellSize + (rows - 1) * GAP_SIZE + PADDING_SIZE * 2;
+        
+        const boardContainer = document.getElementById('boardContainer');
+        if (!boardContainer) return;
+        
+        boardContainer.style.display = 'inline-grid';
+        boardContainer.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
+        boardContainer.style.gap = `${GAP_SIZE}px`;
+        boardContainer.style.padding = `${PADDING_SIZE}px`;
+        boardContainer.style.width = `${boardWidth}px`;
+        boardContainer.style.height = `${boardHeight}px`;
+        
+        boardContainer.innerHTML = '';
+        
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                const val = board[i][j];
+                const isEmpty = (val === null);
+                const isSelected = !confirmed && selected.some(s => s.r === i && s.c === j);
+                const isMovable = confirmed && selected.some(s => s.r === i && s.c === j);
+                let cls = 'cell';
+                if (isEmpty) cls += ' empty';
+                if (isSelected) cls += ' selected';
+                if (isMovable && !isEmpty) cls += ' movable-piece';
+                
+                const cell = document.createElement('div');
+                cell.className = cls;
+                cell.style.width = `${cellSize}px`;
+                cell.style.height = `${cellSize}px`;
+                cell.style.fontSize = `${Math.max(12, cellSize * 0.35)}px`;
+                cell.innerText = isEmpty ? ' ' : val.toString().padStart(2, '0');
+                
+                cell.addEventListener('click', (function(r,c) { return () => {
+                    if (!isGameActive) return;
+                    if (currentGame.isConfirmed()) { 
+                        showDialog('已确认选择，如需重新选择请按重置'); 
+                        return; 
+                    }
+                    currentGame.toggleSelect(r,c);
+                    renderBoardWithZoom();
+                    updateInfoUI();
+                }; })(i,j));
+                
+                boardContainer.appendChild(cell);
+            }
+        }
+        
+        updateInfoUI();
+        
+        const confirmBtn = document.getElementById('confirmSelectBtn');
+        const undoBtn = document.getElementById('undoBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        if (confirmBtn) confirmBtn.disabled = currentGame.isConfirmed();
+        if (undoBtn) undoBtn.disabled = !currentGame.isConfirmed() || currentGame.historyStack.length === 0;
+        if (submitBtn) submitBtn.disabled = !currentGame.isConfirmed();
+        
+        const zoomPercent = document.getElementById('zoomPercent');
+        if (zoomPercent) zoomPercent.innerText = `${Math.round(currentZoom * 100)}%`;
+    }
+
+    function zoomIn() {
+        if (currentZoom >= MAX_ZOOM) return;
+        saveScrollPosition();
+        currentZoom = Math.min(MAX_ZOOM, currentZoom + ZOOM_STEP);
+        renderBoardWithZoom();
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                adjustScrollContainerAlignment();
+                restoreScrollPosition();
+            });
+        });
+    }
+    
+    function zoomOut() {
+        if (currentZoom <= MIN_ZOOM) return;
+        saveScrollPosition();
+        currentZoom = Math.max(MIN_ZOOM, currentZoom - ZOOM_STEP);
+        renderBoardWithZoom();
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                adjustScrollContainerAlignment();
+                restoreScrollPosition();
+            });
+        });
+    }
+    
+    function resetZoom() {
+        saveScrollPosition();
+        currentZoom = 1.0;
+        renderBoardWithZoom();
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                adjustScrollContainerAlignment();
+                restoreScrollPosition();
+            });
+        });
+    }
+
+    function refreshGameUI() {
+        renderBoardWithZoom();
+        updateInfoUI();
+        setTimeout(() => adjustScrollContainerAlignment(), 20);
+    }
+
+    function resetGame() {
+        if (!currentGame) return;
+        currentGame.resetToInitial();
+        timerSeconds = 0;
+        if (timerInterval) stopTimer();
+        startTimer();
+        isGameActive = true;
+        refreshGameUI();
+        setTimeout(() => centerBoardInScroll(), 100);
+        showDialog('盘面已重置为初始状态', '重置成功', 'success');
+    }
+
+    async function submitGame() {
+        if (!currentGame || !isGameActive) return;
+        const finalScore = currentGame.getScore();
+        const steps = currentGame.getSteps();
+        const recordSnapshot = currentGame.getInitialSnapshot();
+        
+        addOrUpdateHistoryRecord(currentRows, currentCols, timerSeconds, steps, finalScore, recordSnapshot);
+        
+        await showDialog(`提交成功！\n得分:${finalScore}\n步数:${steps}\n用时:${timerSeconds}秒`, '成绩已保存', 'success');
+        
+        currentGame.resetToInitial();
+        timerSeconds = 0;
+        startTimer();
+        refreshGameUI();
+        setTimeout(() => centerBoardInScroll(), 100);
+    }
+
+    async function exitToMain() {
+        if (currentGame && isGameActive) {
+            const finalScore = currentGame.getScore();
+            const steps = currentGame.getSteps();
+            const recordSnapshot = currentGame.getInitialSnapshot();
+            
+            addOrUpdateHistoryRecord(currentRows, currentCols, timerSeconds, steps, finalScore, recordSnapshot);
+            await showDialog(`退出游戏\n步数:${steps}\n得分:${finalScore}\n记录已保存`, '游戏退出', 'info');
+        }
+        stopTimer();
+        isGameActive = false;
+        showMainMenu();
+    }
+
+    // 历史记录弹窗
+    function showHistoryModal() {
+        const modal = document.createElement("div");
+        modal.className = "modal-overlay";
+        
+        function renderHistoryList(container) {
+            const list = loadHistory();
+            if (list.length === 0) {
+                container.innerHTML = "<div style='padding:20px; text-align:center; color:#6c4e2e;'>📭 暂无历史记录</div>";
+                return;
+            }
+            container.innerHTML = "";
+            list.forEach(rec => {
+                const div = document.createElement("div");
+                div.className = "history-record-item";
+                div.innerHTML = `
+                    <div class="history-record-info">
+                        <strong>${rec.rows}×${rec.cols}</strong> | ${rec.time}s | 步数 ${rec.steps} | 得分 ${rec.score}
+                    </div>
+                    <div class="history-record-actions">
+                        <button class="view-record-btn" data-id="${rec.id}">查看</button>
+                        <button class="delete-record-btn" data-id="${rec.id}">删除</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            
+            container.querySelectorAll(".view-record-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const id = Number(btn.dataset.id);
+                    const record = loadHistory().find(r => r.id === id);
+                    if (record) showHistoryDetailModal(record);
+                });
+            });
+            
+            container.querySelectorAll(".delete-record-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const id = Number(btn.dataset.id);
+                    deleteHistoryRecord(id);
+                    renderHistoryList(container);
+                });
+            });
+        }
+        
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2 style="margin-top:0;">📜 历史记录</h2>
+                <div class="history-modal-scroll" id="historyRecordsContainer">
+                    <div style="text-align:center; padding:20px;">加载中...</div>
+                </div>
+                <div class="modal-button-container">
+                    <button id="closeHistoryBtn">关闭</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        const container = modal.querySelector("#historyRecordsContainer");
+        renderHistoryList(container);
+        
+        document.getElementById("closeHistoryBtn").addEventListener("click", () => modal.remove());
+    }
+    
+    function showHistoryDetailModal(record) {
+        const modal = document.createElement("div");
+        modal.className = "modal-overlay";
+        
+        const board = record.boardSnapshot;
+        const rows = board.length, cols = board[0].length;
+        const maxPreviewRows = Math.min(rows, 12);
+        const maxPreviewCols = Math.min(cols, 10);
+        
+        let previewHtml = `<div class="preview-board" style="grid-template-columns: repeat(${maxPreviewCols}, 40px); gap:2px;">`;
+        for (let i = 0; i < maxPreviewRows; i++) {
+            for (let j = 0; j < maxPreviewCols; j++) {
+                const val = board[i][j];
+                previewHtml += `<div class="preview-cell" style="width:40px;height:40px;">${val.toString().padStart(2,'0')}</div>`;
+            }
+        }
+        previewHtml += `</div>`;
+        if (rows > 12 || cols > 10) {
+            previewHtml += '<p style="text-align:center; margin-top:10px; color:#7c5f3a;">... 仅显示前12行/10列</p>';
+        }
+        
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2 style="margin-top:0;">📋 对局详情</h2>
+                <div class="history-modal-scroll">
+                    <p><strong>📐 尺寸:</strong> ${record.rows}×${record.cols}</p>
+                    <p><strong>⏱️ 用时:</strong> ${record.time} 秒</p>
+                    <p><strong>📌 步数:</strong> ${record.steps}</p>
+                    <p><strong>🍖 得分:</strong> ${record.score}</p>
+                    <p><strong>📅 完成时间:</strong> ${record.date}</p>
+                    <h3>✨ 初始盘面预览:</h3>
+                    ${previewHtml}
+                </div>
+                <div class="modal-button-container">
+                    <button id="replayFromDetailBtn">🎮 开始游玩此对局</button>
+                    <button id="closeDetailBtn">关闭</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        document.getElementById("closeDetailBtn").addEventListener("click", () => modal.remove());
+        document.getElementById("replayFromDetailBtn").addEventListener("click", () => {
+            document.querySelectorAll('.modal-overlay').forEach(el => el.remove());
+            stopTimer();
+            currentGame = new GameEngine(record.rows, record.cols, record.boardSnapshot);
+            currentRows = record.rows;
+            currentCols = record.cols;
+            timerSeconds = 0;
+            isGameActive = true;
+            startTimer();
+            renderFullGameInterface();
+        });
+    }
+
+    function startGameWithSize() {
+        let w = currentCols, h = currentRows;
+        w = Math.min(30, Math.max(10, w));
+        h = Math.min(30, Math.max(10, h));
+        currentCols = w; currentRows = h;
+        stopTimer();
+        currentGame = new GameEngine(h, w);
+        timerSeconds = 0;
+        isGameActive = true;
+        startTimer();
+        renderFullGameInterface();
+    }
+
+    function renderFullGameInterface() {
+        const gameHtml = `
+            <div class="game-wrapper">
+                <div class="game-panel">
+                    <div class="info-bar">
+                        <div class="info-item">⏱️ 用时 <span id="gameTimer">0</span> s</div>
+                        <div class="info-item">🚶 步数 <span id="stepCount">0</span></div>
+                        <div class="info-item">🏆 得分 <span id="totalScore">0</span></div>
+                        <div class="info-item">🎲 已选 <span id="selectedCount">0</span>/5</div>
+                    </div>
+                    <div class="board-area">
+                        <div class="board-scroll-container" id="scrollContainer">
+                            <div class="board-wrapper">
+                                <div id="boardContainer" class="board"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-bar">
+                        <div class="action-row">
+                            <button id="undoBtn">↩️ 撤销</button>
+                            <button id="confirmSelectBtn">✅ 确认选择</button>
+                            <button id="resetBtn">🔄 重置</button>
+                            <button id="submitBtn">🏁 提交</button>
+                            <button id="exitBtn">🚪 退出</button>
+                        </div>
+                        <div class="action-row">
+                            <button class="dir-btn" data-dir="up">▲</button>
+                            <button class="dir-btn" data-dir="left">◀</button>
+                            <button class="dir-btn" data-dir="down">▼</button>
+                            <button class="dir-btn" data-dir="right">▶</button>
+                            <div class="zoom-control">
+                                <button id="zoomOutBtn">−</button>
+                                <span id="zoomPercent">100%</span>
+                                <button id="zoomInBtn">+</button>
+                                <button id="zoomResetBtn" style="font-size:0.8rem; padding:4px 10px;">重置</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        app.innerHTML = gameHtml;
+        
+        renderBoardWithZoom();
+        
+        document.getElementById('zoomInBtn').onclick = zoomIn;
+        document.getElementById('zoomOutBtn').onclick = zoomOut;
+        document.getElementById('zoomResetBtn').onclick = resetZoom;
+        
+        document.getElementById('confirmSelectBtn').onclick = () => { 
+            if(currentGame.confirmSelection()) refreshGameUI(); 
+            else showDialog('请选择5枚棋子', '提示'); 
+        };
+        document.getElementById('undoBtn').onclick = () => { 
+            if(currentGame.undo()) refreshGameUI(); 
+            else showDialog('无历史可撤销', '提示'); 
+        };
+        document.getElementById('resetBtn').onclick = () => resetGame();
+        document.getElementById('submitBtn').onclick = () => submitGame();
+        document.getElementById('exitBtn').onclick = () => exitToMain();
+        
+        document.querySelectorAll('.dir-btn').forEach(btn => {
+            btn.onclick = () => { 
+                if(currentGame.isConfirmed()) { 
+                    currentGame.move(btn.dataset.dir); 
+                    refreshGameUI(); 
+                } 
+            };
+        });
+        
+        window.addEventListener('resize', () => {
+            setTimeout(() => {
+                adjustScrollContainerAlignment();
+                centerBoardInScroll();
+            }, 100);
+        });
+        
+        window.onkeydown = (e) => {
+            if (!isGameActive || !currentGame?.isConfirmed()) return;
+            let dir = null;
+            if (e.key === 'ArrowUp' || e.key === 'w') dir='up';
+            else if (e.key === 'ArrowDown' || e.key === 's') dir='down';
+            else if (e.key === 'ArrowLeft' || e.key === 'a') dir='left';
+            else if (e.key === 'ArrowRight' || e.key === 'd') dir='right';
+            if (dir) { e.preventDefault(); currentGame.move(dir); refreshGameUI(); }
+        };
+        
+        setTimeout(() => {
+            adjustScrollContainerAlignment();
+            centerBoardInScroll();
+        }, 50);
+    }
+
+    function showRuleModal() {
+        const modal = document.createElement("div");
+        modal.className = "modal-overlay";
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2 style="margin-top:0;">📖 游戏规则</h2>
+                <div class="history-modal-scroll">
+                    <div class="rule-text">
+                        <strong>🎲 数字吞噬者</strong><br><br>
+                        1️⃣ 开局先选择5枚棋子后，点击【确认选择】<br>
+                        2️⃣ 方向键/WASD：所有棋子尝试同向移动一格<br>
+                        3️⃣ 若目标格棋子的十位与移动棋子的十位相同，或个位与移动棋子的个位相同，则可以吞噬<br>
+                        4️⃣ 无法移动的棋子留在原地，其他正常移动<br>
+                        5️⃣ 移动的棋子之间不可以相互吞噬：当多个棋子移动到同一格时，按顺序依次吞噬合并<br>
+                        6️⃣ 被吃掉的棋子变为空位，不会重新生成<br>
+                        7️⃣ 目标：尽可能多的吃棋子获得高分！<br>
+                        8️⃣ 支持撤销、重置、提交记录历史，可重复游玩历史盘面并更新高分。<br>
+                        <br>
+                        <strong>⚠️ 吃子规则示例：</strong><br>
+                        • 23 和 25：十位相同(2=2) → 可以吃 ✓<br>
+                        • 23 和 43：个位相同(3=3) → 可以吃 ✓<br>
+                        • 23 和 54：十位(2≠5) 且 个位(3≠4) → 不能吃 ✗<br>
+                    </div>
+                </div>
+                <div class="modal-button-container">
+                    <button id="closeRuleBtn">关闭</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        document.getElementById("closeRuleBtn").addEventListener("click", () => modal.remove());
+    }
+
+    function showMainMenu() {
+        if (timerInterval) clearInterval(timerInterval);
+        isGameActive = false;
+        
+        const mainHtml = `
+            <div class="main-menu-container">
+                <div class="main-menu-view">
+                    <div class="game-title">🍢 数字吞噬者</div>
+                    <div class="size-control">
+                        <div class="slider-item">
+                            <div class="slider-header">
+                                <label>📏 宽度 (列数)</label>
+                                <span class="slider-value" id="colVal">15</span>
+                            </div>
+                            <input type="range" id="colSlider" min="10" max="30" value="15" step="1">
+                        </div>
+                        <div class="slider-item">
+                            <div class="slider-header">
+                                <label>📐 高度 (行数)</label>
+                                <span class="slider-value" id="rowVal">15</span>
+                            </div>
+                            <input type="range" id="rowSlider" min="10" max="30" value="15" step="1">
+                        </div>
+                    </div>
+                    <div class="menu-buttons">
+                        <button id="startFromMenu">✨ 开始游戏 </button>
+                        <button id="ruleMenuBtn">📖 规则介绍</button>
+                    </div>
+                    <button id="historyMenuBtn" style="background: #7c5f3a; color: white; font-size: 1.3rem;">📜 历史记录</button>
+                    <footer>🎲 选择5枚棋子 → 确认选择 → 方向键协同移动</footer>
+                </div>
+            </div>
+        `;
+        app.innerHTML = mainHtml;
+        
+        const colSlider = document.getElementById('colSlider');
+        const rowSlider = document.getElementById('rowSlider');
+        const colVal = document.getElementById('colVal');
+        const rowVal = document.getElementById('rowVal');
+        
+        colSlider.addEventListener('input', (e) => {
+            currentCols = parseInt(e.target.value);
+            colVal.innerText = currentCols;
+        });
+        rowSlider.addEventListener('input', (e) => {
+            currentRows = parseInt(e.target.value);
+            rowVal.innerText = currentRows;
+        });
+        
+        document.getElementById('startFromMenu').onclick = () => {
+            currentCols = parseInt(colSlider.value);
+            currentRows = parseInt(rowSlider.value);
+            startGameWithSize();
+        };
+        document.getElementById('ruleMenuBtn').onclick = showRuleModal;
+        document.getElementById('historyMenuBtn').onclick = showHistoryModal;
+    }
+
+    showMainMenu();
+</script>
+</body>
+</html>

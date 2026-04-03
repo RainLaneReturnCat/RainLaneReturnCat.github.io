@@ -694,17 +694,6 @@
             font-size: 1rem;
         }
 
-        /* 高亮闪烁动画 */
-        @keyframes blink-highlight {
-            0% { background-color: #ff6666; box-shadow: 0 0 0 1px #ff0000; }
-            50% { background-color: #ff0000; box-shadow: 0 0 0 2px #ff8888; }
-            100% { background-color: #ff6666; box-shadow: 0 0 0 1px #ff0000; }
-        }
-        .cell.layer-connection-highlight {
-            animation: blink-highlight 0.8s ease-in-out infinite;
-            z-index: 5;
-        }
-
         .bottom-control-bar {
             background: #10333f;
             border-radius: 60px;
@@ -759,6 +748,7 @@
 
         /* ========== 移动端适配样式（新增，不影响PC端） ========== */
         @media (max-width: 1024px) {
+            /* 主界面垂直布局 */
             .main-menu {
                 padding: 20px 15px;
             }
@@ -780,6 +770,7 @@
                 font-size: 1.2rem;
             }
             
+            /* 游戏头部：计时第一行，统计第二行 */
             .game-header {
                 flex-direction: column;
                 align-items: stretch;
@@ -802,6 +793,7 @@
                 font-size: 1.3rem;
             }
             
+            /* 游戏区域 - 水平滚动容器 */
             .game-grid {
                 display: flex;
                 flex-direction: column;
@@ -822,7 +814,7 @@
                 -webkit-overflow-scrolling: touch;
                 justify-content: flex-start;
                 padding: 5px 0;
-                scroll-behavior: auto;
+		scroll-behavior: auto;
             }
             .layer-card {
                 flex: 0 0 auto;
@@ -846,17 +838,20 @@
             .layer-label small {
                 font-size: 0.8rem;
             }
-            .blank .rotate-badge {
-                display: inline-block;
-                font-size: 0.8rem;
-                background: rgba(0,0,0,0.6);
-                padding: 2px 5px;
-                border-radius: 8px;
-            }
-            .rotate-badge:not(.blank .rotate-badge) {
-                display: none;
-            }
+    	    /* 困难模式操作盘面的旋转角标显示 */
+    	    .blank .rotate-badge {
+        	display: inline-block;
+        	font-size: 0.8rem;
+        	background: rgba(0,0,0,0.6);
+        	padding: 2px 5px;
+        	border-radius: 8px;
+    	    }
+    	    /* 其他位置的旋转角标隐藏 */
+    	    .rotate-badge:not(.blank .rotate-badge) {
+        	display: none;
+    	    }
             
+            /* 底部操作栏：两行布局 */
             .bottom-control-bar {
                 flex-direction: column;
                 align-items: stretch;
@@ -874,6 +869,7 @@
                 min-height: 44px;
             }
             
+            /* 历史记录界面：一行一条记录 */
             .history-list {
                 grid-template-columns: 1fr;
                 gap: 12px;
@@ -891,6 +887,7 @@
                 font-size: 0.85rem;
             }
             
+            /* 预览弹窗：前五层和后五层独立水平滚动 */
             .preview-modal-content {
                 padding: 20px;
             }
@@ -926,6 +923,7 @@
                 font-size: 1rem;
             }
             
+            /* 弹窗移动端适配 */
             .difficulty-content, .modal-content, .penalty-content {
                 padding: 25px;
                 margin: 20px;
@@ -948,12 +946,14 @@
                 font-size: 0.8rem;
             }
             
+            /* 屏幕容器调整 */
             .screen {
                 padding: 15px;
                 max-height: 98vh;
                 overflow-x: visible;
             }
             
+            /* 增加点击区域 */
             .action-btn {
                 min-width: 80px;
             }
@@ -962,55 +962,58 @@
             }
         }
 
-        @media (max-width: 768px) {
-            .history-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 18px;
-                gap: 10px;
-            }
-            .history-header h2 {
-                font-size: 1.4rem;
-                margin: 0;
-                white-space: nowrap;
-            }
-            .back-btn {
-                font-size: 0.8rem;
-                padding: 7px 16px;
-                border-radius: 30px;
-                background: #225f6b;
-            }
-            .history-list {
-                grid-template-columns: 1fr;
-                gap: 12px;
-                max-height: 550px;
-            }
-            .history-item {
-                padding: 12px 15px;
-                gap: 10px;
-            }
-            .history-info {
-                font-size: 0.85rem;
-                gap: 8px;
-                flex-wrap: wrap;
-            }
-            .view-btn, .delete-btn {
-                padding: 6px 14px;
-                font-size: 0.8rem;
-            }
-            .safe-area-bottom {
-                height: env(safe-area-inset-bottom, 0px);
-                width: 100%;
-                min-height: 56px;
-                background: transparent;
-                pointer-events: none;
-            }
-            .difficulty-btn {
-                padding: 10px 25px;
-                font-size: 1rem;
-            }
-        }
+	@media (max-width: 768px) {
+
+    	/* ========== 历史记录界面移动端优化 ========== */
+
+    	.history-header {
+        	display: flex;
+        	justify-content: space-between;
+        	align-items: center;
+        	margin-bottom: 18px;
+        	gap: 10px;
+    	}
+    	.history-header h2 {
+        	font-size: 1.4rem;
+        	margin: 0;
+        	white-space: nowrap;
+    	}
+    	.back-btn {
+        	font-size: 0.85rem;
+        	padding: 7px 16px;
+        	border-radius: 30px;
+        	background: #225f6b;
+    	}
+    	.history-list {
+        	grid-template-columns: 1fr;
+        	gap: 12px;
+        	max-height: 550px;
+    	}
+    	.history-item {
+        	padding: 12px 15px;
+        	gap: 10px;
+    	}
+    	.history-info {
+        	font-size: 0.85rem;
+        	gap: 8px;
+        	flex-wrap: wrap;
+    	}
+    	.view-btn, .delete-btn {
+        	padding: 6px 14px;
+        	font-size: 0.8rem;
+    	}
+	/* 安全区域底部容器 - 透明适配 */
+	.safe-area-bottom {
+    		height: env(safe-area-inset-bottom, 0px);
+    		width: 100%;
+		min-height: 44px;
+    		background: transparent;
+    		pointer-events: none; /* 让容器不阻挡点击事件 */
+	}
+}
+
+
+	
     </style>
 </head>
 <body>
@@ -1032,11 +1035,6 @@
             <div class="checkbox-group">
                 <input type="checkbox" id="infiniteTimeCheckbox">
                 <label style="color:#ffe3b0;" for="infiniteTimeCheckbox">♾️ 无限时长模式</label>
-            </div>
-            <!-- 新增：层间高亮开关 -->
-            <div class="checkbox-group">
-                <input type="checkbox" id="layerHighlightCheckbox" checked>
-                <label style="color:#ffe3b0;" for="layerHighlightCheckbox">✨ 层间高亮提示</label>
             </div>
             <div class="menu-buttons">
                 <button class="menu-btn" id="startGameBtn">🚀 开始游戏</button>
@@ -1107,9 +1105,8 @@
                     </ul>
                 </li>
                 <li><strong>计时：</strong>可自定义5-60分钟倒计时，或开启无限时长模式</li>
-                <li><strong>覆盖率：</strong>可自定义障碍覆盖率，范围为15%-45%，初始默认为30%</li>
+                <li><strong>覆盖率：</strong>可自定义障碍覆盖率，范围为25%-60%</li>
                 <li><strong>历史记录：</strong>每局游戏只记录一次最优路径，数据保存在本地</li>
-                <li><strong>辅助功能：</strong>可开启层间高亮提示，闪烁显示当前可跨层移动的格子</li>
             </ul>
             <button class="close-modal" id="closeRulesBtn">知道了</button>
         </div>
@@ -1119,7 +1116,7 @@
     <div id="historyScreen" class="screen history-screen hidden">
         <div class="history-header">
             <h2>📋 历史对局记录</h2>
-            <button class="back-btn" id="backToMainBtn">返回主菜单</button>
+            <button class="back-btn" id="backToMainBtn">← 返回主菜单</button>
         </div>
         <div class="history-list" id="historyList"></div>
     </div>
@@ -1159,7 +1156,8 @@
                 <button class="action-btn exit" id="exitGameBtn">⏏️ 退出</button>
             </div>
         </div>
-        <div class="safe-area-bottom"></div>
+    	  <!-- 安全区域容器，防止浏览器底部栏遮挡 -->
+    	  <div class="safe-area-bottom"></div>
     </div>
 
     <script type="module">
@@ -1216,9 +1214,6 @@
             let tapTimer = null;
             let pendingLayer = null;
             const DOUBLE_TAP_DELAY = 300;
-            
-            // 层间高亮开关
-            let layerHighlightEnabled = true;
 
             // UI元素
             const toastMessage = document.getElementById('toastMessage');
@@ -1234,7 +1229,6 @@
             const timeLimitSlider = document.getElementById('timeLimitSlider');
             const timeLimitValue = document.getElementById('timeLimitValue');
             const infiniteTimeCheckbox = document.getElementById('infiniteTimeCheckbox');
-            const layerHighlightCheckbox = document.getElementById('layerHighlightCheckbox');
             const startBtn = document.getElementById('startGameBtn');
             const easyModeBtn = document.getElementById('easyModeBtn');
             const hardModeBtn = document.getElementById('hardModeBtn');
@@ -1260,15 +1254,6 @@
             const resetPathBtn = document.getElementById('resetPathBtn');
             const submitGameBtn = document.getElementById('submitGameBtn');
             const exitGameBtn = document.getElementById('exitGameBtn');
-
-            // 监听层间高亮开关
-            layerHighlightCheckbox.addEventListener('change', (e) => {
-                layerHighlightEnabled = e.target.checked;
-                if (gameActive) {
-                    // 立即刷新高亮显示
-                    applyLayerConnectionHighlights();
-                }
-            });
 
             function showMessage(msg) {
                 toastMessage.innerText = msg;
@@ -1798,7 +1783,7 @@
                 
                 // 移动端：使用200ms判断逻辑
                 if (isMobile()) {
-                    e.stopPropagation();
+		    e.stopPropagation();
                     handleMobileLayerTap(layer, label);
                     return;
                 }
@@ -1855,70 +1840,18 @@
                 savedScrollPositions = Array.from(containers).map(c => c ? c.scrollLeft : 0);
             }
             
-            function restoreScrollPositions() {
-                if (!isMobile()) return;
-                requestAnimationFrame(() => {
-                    const containers = document.querySelectorAll('.layers-row');
-                    containers.forEach((container, index) => {
-                        if (container && savedScrollPositions[index] !== undefined) {
-                            container.scrollLeft = savedScrollPositions[index];
-                        }
-                    });
-                });
-            }
-
-            // 应用高亮样式到单元格 - 根据开关决定是否显示
-            function applyLayerConnectionHighlights() {
-                // 移除所有现有高亮
-                document.querySelectorAll('.cell.layer-connection-highlight').forEach(cell => {
-                    cell.classList.remove('layer-connection-highlight');
-                });
-                
-                // 如果高亮功能未启用，直接返回
-                if (!layerHighlightEnabled) return;
-                
-                if (!gameActive) return;
-                
-                // 如果路径为空，不需要高亮
-                if (pathPositions.length === 0) return;
-                
-                // 获取路径末端位置（最后一个格子）
-                const lastPos = pathPositions[pathPositions.length - 1];
-                if (!lastPos) return;
-                
-                const totalLayers = currentMode === 'easy' ? 5 : 10;
-                
-                // 检查上下层
-                for (const deltaLayer of [-1, 1]) {
-                    const targetLayer = lastPos.layer + deltaLayer;
-                    if (targetLayer < 0 || targetLayer >= totalLayers) continue;
-                    
-                    // 获取目标层的格子数据
-                    let targetLayerData;
-                    if (currentMode === 'easy') {
-                        targetLayerData = currentLayers[targetLayer];
-                    } else {
-                        targetLayerData = targetLayer < 5 ? baseLayers[targetLayer] : blankLayers[targetLayer - 5];
-                    }
-                    
-                    // 检查同坐标格子是否可通行（不是障碍）
-                    if (targetLayerData && targetLayerData[lastPos.r] && targetLayerData[lastPos.r][lastPos.c] !== undefined) {
-                        const targetVal = targetLayerData[lastPos.r][lastPos.c];
-                        
-                        // 检查该格子是否已经在路径中
-                        const isAlreadyInPath = pathPositions.some(p => p.layer === targetLayer && p.r === lastPos.r && p.c === lastPos.c);
-                        
-                        // 不是障碍 且 不在路径中 才高亮
-                        if (targetVal !== 1 && !isAlreadyInPath) {
-                            const selector = `.cell[data-layer="${targetLayer}"][data-row="${lastPos.r}"][data-col="${lastPos.c}"]`;
-                            const cell = document.querySelector(selector);
-                            if (cell) {
-                                cell.classList.add('layer-connection-highlight');
-                            }
-                        }
-                    }
-                }
-            }
+	    // 更简洁的恢复滚动位置函数 - 直接使用 requestAnimationFrame
+	   function restoreScrollPositions() {
+    		    if (!isMobile()) return;
+    		    requestAnimationFrame(() => {
+        		    const containers = document.querySelectorAll('.layers-row');
+        		    containers.forEach((container, index) => {
+            			    if (container && savedScrollPositions[index] !== undefined) {
+                			    container.scrollLeft = savedScrollPositions[index];
+            			    }
+        		    });
+    		    });
+	    }
 
             function renderGrid() {
                 // 保存当前滚动位置
@@ -1966,24 +1899,20 @@
                 updateSelectedHighlight();
                 updateStepsDisplay();
                 
-                // 恢复滚动位置
-                if (isMobile()) {
-                    requestAnimationFrame(() => {
-                        const containers = document.querySelectorAll('.layers-row');
-                        containers.forEach((container, index) => {
-                            if (container && savedScrollPositions[index] !== undefined) {
-                                container.scrollLeft = savedScrollPositions[index];
-                            }
-                        });
-                    });
-                }
-                
-                // 应用层间高亮
-                setTimeout(() => {
-                    applyLayerConnectionHighlights();
-                }, 10);
-            }
-
+                // 恢复滚动位置 - 使用 requestAnimationFrame 确保在渲染完成后立即恢复，避免视觉跳动
+		if (isMobile()) {
+    			// 使用 requestAnimationFrame 确保在下一帧渲染前恢复
+    			requestAnimationFrame(() => {
+        			const containers = document.querySelectorAll('.layers-row');
+        			containers.forEach((container, index) => {
+            				if (container && savedScrollPositions[index] !== undefined) {
+                				// 直接设置 scrollLeft，不使用动画，避免视觉跳动
+                				container.scrollLeft = savedScrollPositions[index];
+            				}
+        			});
+    			});
+		}
+}
             function generateLayerCard(layerIndex, isInitialOnly = false) {
                 let layerName = '';
                 let cardClass = 'layer-card';
@@ -2095,26 +2024,32 @@
                 const val = layerData[row][col];
                 
                 // 困难模式障碍块处理：只有路径当前位置四周的障碍块才触发罚时
-                if (currentMode === 'hard' && val === 1) {
-                    if (pathPositions.length > 0) {
-                        const lastPos = pathPositions[pathPositions.length - 1];
-                        const isAdjacentToPath = (
-                            (layer === lastPos.layer && Math.abs(row - lastPos.r) + Math.abs(col - lastPos.c) === 1) ||
-                            (Math.abs(layer - lastPos.layer) === 1 && row === lastPos.r && col === lastPos.c)
-                        );
-                        if (isAdjacentToPath) {
-                            startPenalty();
-                            return;
-                        } else {
-                            showMessage('此处是障碍物，无法通行');
-                            return;
-                        }
-                    } else {
-                        showMessage('此处是障碍物，无法通行');
-                        return;
-                    }
-                }
-                if (val === 1) return;
+		if (currentMode === 'hard' && val === 1) {
+    			    // 获取路径当前位置（最后一个格子）
+    			    if (pathPositions.length > 0) {
+       				     const lastPos = pathPositions[pathPositions.length - 1];
+        
+        			    // 检查当前点击的障碍块是否在路径当前位置的四周（上下左右）
+       				     const isAdjacentToPath = (
+            				    (layer === lastPos.layer && Math.abs(row - lastPos.r) + Math.abs(col - lastPos.c) === 1) ||
+            				    (Math.abs(layer - lastPos.layer) === 1 && row === lastPos.r && col === lastPos.c)
+        );
+        
+        			    if (isAdjacentToPath) {
+            				    startPenalty();
+            				    return;
+        			    } else {
+            				    // 非四周的障碍块，只提示不能走
+            				    showMessage('此处是障碍物，无法通行');
+            				    return;
+        			    }
+    			    } else {
+        			    // 还没有路径时，点击任何障碍都不触发罚时
+        			    showMessage('此处是障碍物，无法通行');
+       			    	    return;
+    		    }
+	}
+	if (val === 1) return;
                 
                 let newPos = {layer, r:row, c:col};
                 const startLayer = currentMode === 'easy' ? START.layer : START.layer + 5;
@@ -2151,10 +2086,6 @@
             function updateStepsDisplay() {
                 currentStepsSpan.innerText = Math.max(0, getPathSteps());
                 updateUndoFiveButton();
-                // 更新高亮
-                setTimeout(() => {
-                    applyLayerConnectionHighlights();
-                }, 10);
             }
 
             function undo() {
