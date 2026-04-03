@@ -24,7 +24,7 @@ const sheetFilesConfig = {
         { name: "百鬼֎夜行", filename: "百鬼֎夜行.zip", size: "5.03 MB", sheetId: 10 },
         { name: "百九十(Milthm Ver.)", filename: "百九十(Milthm Ver.).zip", size: "6.19 MB", sheetId: 11 },
         { name: "灰の羽搏", filename: "灰の羽搏.zip", size: "12.7 MB", sheetId: 12 },
-        { name: "神金! 刺刃这个傻福没福硬装! ! 牛福! ! ! 竟然在图书馆爱上了杨苔并穿越到蒸汽时代要吻! ! ! ! 让DBLS2026的屎都笑成瞎填拉! ! ! ! ! ( 全圈最有革命意义的Compsteriousetal Remix! ! ! ! ! ! )", filename: "神金! 刺刃这个傻福没福硬装! ! 牛福! ! ! 竟然在图书馆爱上了杨苔并穿越到蒸汽时代要吻! ! ! ! 让DBLS2026的屎都笑成瞎填拉! ! ! ! ! ( 全圈最有革命意义的Compsteriousetal Remix! ! ! ! ! ! ).zip", size: "29.6 MB", sheetId: 13 },
+        { name: "神金! 刺刃这个傻福没福硬装! ! 牛福! ! ! 竟然在图书馆爱上了杨苔…… ", filename: "神金! 刺刃这个傻福没福硬装! ! 牛福! ! ! 竟然在图书馆爱上了杨苔并穿越到蒸汽时代要吻! ! ! ! 让DBLS2026的屎都笑成瞎填拉! ! ! ! ! ( 全圈最有革命意义的Compsteriousetal Remix! ! ! ! ! ! ).zip", size: "29.6 MB", sheetId: 13 },
         { name: "时间尽头", filename: "时间尽头.zip", size: "34.0 MB", sheetId: 14 },
         { name: "蝎虎天体 -Lacertid-", filename: "蝎虎天体 -Lacertid-.zip", size: "2.64 MB", sheetId: 15 },
     ],
@@ -41,7 +41,7 @@ const sheetFilesConfig = {
         { name: "百鬼֎夜行", filename: "百鬼֎夜行.pez", size: "5.03 MB", sheetId: 10 },
         { name: "百九十(Milthm Ver.)", filename: "百九十(Milthm Ver.).pez", size: "6.19 MB", sheetId: 11 },
         { name: "灰の羽搏", filename: "灰の羽搏.pez", size: "12.7 MB", sheetId: 12 },
-        { name: "神金! 刺刃这个傻福没福硬装! ! 牛福! ! ! 竟然在图书馆爱上了杨苔并穿越到蒸汽时代要吻! ! ! ! 让DBLS2026的屎都笑成瞎填拉! ! ! ! ! ( 全圈最有革命意义的Compsteriousetal Remix! ! ! ! ! ! )", filename: "神金! 刺刃这个傻福没福硬装! ! 牛福! ! ! 竟然在图书馆爱上了杨苔并穿越到蒸汽时代要吻! ! ! ! 让DBLS2026的屎都笑成瞎填拉! ! ! ! ! ( 全圈最有革命意义的Compsteriousetal Remix! ! ! ! ! ! ).pez", size: "29.6 MB", sheetId: 13 },
+        { name: "神金! 刺刃这个傻福没福硬装! ! 牛福! ! ! 竟然在图书馆爱上了杨苔…… ", filename: "神金! 刺刃这个傻福没福硬装! ! 牛福! ! ! 竟然在图书馆爱上了杨苔并穿越到蒸汽时代要吻! ! ! ! 让DBLS2026的屎都笑成瞎填拉! ! ! ! ! ( 全圈最有革命意义的Compsteriousetal Remix! ! ! ! ! ! ).pez", size: "29.6 MB", sheetId: 13 },
         { name: "时间尽头", filename: "时间尽头.pez", size: "34.0 MB", sheetId: 14 },
         { name: "蝎虎天体 -Lacertid-", filename: "蝎虎天体 -Lacertid-.pez", size: "2.64 MB", sheetId: 15 },
     ]
@@ -186,6 +186,7 @@ function switchFileType(type) {
     // 切换模态框头部主题色和文件列表主题色
     changeModalHeaderTheme(type);
 }
+
 // 显示文件列表
 function showFileList(type) {
     const fileListDiv = document.getElementById('file-list');
@@ -207,10 +208,9 @@ function showFileList(type) {
                 <div class="file-name">
                     <span>${fileIcon}</span>
                     <span>${escapeHtml(displayName)}</span>
-                    <span style="font-size: 11px; color: #999;">(${file.size})</span>
                 </div>
                 <button class="download-btn" data-filename="${file.filename}">
-                    📥 下载
+                    📥 下载 ${file.size}
                 </button>
             </div>
         `;
@@ -227,7 +227,6 @@ function showFileList(type) {
         });
     });
 }
-
 
 // 打开谱面文件弹窗
 function openSheetModal() {
