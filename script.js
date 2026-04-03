@@ -5,7 +5,7 @@ const profileConfig = {
     authorName: "雨巷猫归",
     bio: "Phigros谱面自制 | 兽控 | 网页小游戏开发\n热爱创作独特的谱面和有趣的游戏体验，喜欢任何兽兽",
     avatarUrl: "images/avatar.jpg",
-    lastUpdate: "2026-03-26"
+    lastUpdate: "2026-04-03"
 };
 
 // 谱面文件分类 - 同一个谱面有ZIP和PEZ两种格式
@@ -24,7 +24,9 @@ const sheetFilesConfig = {
         { name: "百鬼֎夜行", filename: "百鬼֎夜行.zip", size: "5.03 MB", sheetId: 10 },
         { name: "百九十(Milthm Ver.)", filename: "百九十(Milthm Ver.).zip", size: "6.19 MB", sheetId: 11 },
         { name: "灰の羽搏", filename: "灰の羽搏.zip", size: "12.7 MB", sheetId: 12 },
-        { name: "蝎虎天体 -Lacertid-", filename: "蝎虎天体 -Lacertid-.zip", size: "2.64 MB", sheetId: 13 },
+        { name: "神金! 刺刃这个傻福没福硬装! ! 牛福! ! ! 竟然在图书馆爱上了杨苔并穿越到蒸汽时代要吻! ! ! ! 让DBLS2026的屎都笑成瞎填拉! ! ! ! ! ( 全圈最有革命意义的Compsteriousetal Remix! ! ! ! ! ! )", filename: "神金! 刺刃这个傻福没福硬装! ! 牛福! ! ! 竟然在图书馆爱上了杨苔并穿越到蒸汽时代要吻! ! ! ! 让DBLS2026的屎都笑成瞎填拉! ! ! ! ! ( 全圈最有革命意义的Compsteriousetal Remix! ! ! ! ! ! ).zip", size: "29.6 MB", sheetId: 13 },
+        { name: "时间尽头", filename: "时间尽头.zip", size: "34.0 MB", sheetId: 14 },
+        { name: "蝎虎天体 -Lacertid-", filename: "蝎虎天体 -Lacertid-.zip", size: "2.64 MB", sheetId: 15 },
     ],
     pez: [
         { name: "Final Phase", filename: "Final Phase.pez", size: "5.77 MB", sheetId: 1 },
@@ -39,7 +41,9 @@ const sheetFilesConfig = {
         { name: "百鬼֎夜行", filename: "百鬼֎夜行.pez", size: "5.03 MB", sheetId: 10 },
         { name: "百九十(Milthm Ver.)", filename: "百九十(Milthm Ver.).pez", size: "6.19 MB", sheetId: 11 },
         { name: "灰の羽搏", filename: "灰の羽搏.pez", size: "12.7 MB", sheetId: 12 },
-        { name: "蝎虎天体 -Lacertid-", filename: "蝎虎天体 -Lacertid-.pez", size: "2.64 MB", sheetId: 13 },
+        { name: "神金! 刺刃这个傻福没福硬装! ! 牛福! ! ! 竟然在图书馆爱上了杨苔并穿越到蒸汽时代要吻! ! ! ! 让DBLS2026的屎都笑成瞎填拉! ! ! ! ! ( 全圈最有革命意义的Compsteriousetal Remix! ! ! ! ! ! )", filename: "神金! 刺刃这个傻福没福硬装! ! 牛福! ! ! 竟然在图书馆爱上了杨苔并穿越到蒸汽时代要吻! ! ! ! 让DBLS2026的屎都笑成瞎填拉! ! ! ! ! ( 全圈最有革命意义的Compsteriousetal Remix! ! ! ! ! ! ).pez", size: "29.6 MB", sheetId: 13 },
+        { name: "时间尽头", filename: "时间尽头.pez", size: "34.0 MB", sheetId: 14 },
+        { name: "蝎虎天体 -Lacertid-", filename: "蝎虎天体 -Lacertid-.pez", size: "2.64 MB", sheetId: 15 },
     ]
 };
 

@@ -515,7 +515,7 @@ body.dark-mode .modal-content {
 
 /* PEZ 模式下的头部渐变 */
 .modal-header.pez-mode {
-    background: linear-gradient(135deg, #4facfe 0%, #00C8FE 100%);
+    background: linear-gradient(135deg, #00C8FE 0%, #4facfe 100%);
     box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
 }
 /* 添加流动光效 */
