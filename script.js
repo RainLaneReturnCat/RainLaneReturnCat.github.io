@@ -5,12 +5,12 @@ const profileConfig = {
     authorName: "雨巷猫归",
     bio: "Phigros谱面自制 | 兽控 | 网页小游戏开发\n热爱创作独特的谱面和有趣的游戏体验，喜欢任何兽兽",
     avatarUrl: "images/avatar.jpg",
-    lastUpdate: "2026-04-03"
+    lastUpdate: "2026-04-12"
 };
 
 // 谱面文件分类 - 同一个谱面有ZIP和PEZ两种格式
 // 每个谱面对象包含 name（显示名称），zipFile（ZIP文件名），pezFile（PEZ文件名），size（大小）
-const sheetFilesConfig = {Flashback Flicker
+const sheetFilesConfig = {
     zip: [
         { name: "Final Phase", filename: "Final Phase.zip", size: "5.77 MB", sheetId: 1 },
         { name: "Flashback Flicker", filename: "Flashback Flicker.zip", size: "4.64 MB", sheetId: 2 },
