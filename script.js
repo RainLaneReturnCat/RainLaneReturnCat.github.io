@@ -5,7 +5,7 @@ const profileConfig = {
     authorName: "雨巷猫归",
     bio: "Phigros谱面自制 | 兽控 | 网页小游戏开发\n热爱创作独特的谱面和有趣的游戏体验，喜欢任何兽兽",
     avatarUrl: "images/avatar.jpg",
-    lastUpdate: "2026-04-12"
+    lastUpdate: "2026-04-13"
 };
 
 // 谱面文件分类 - 同一个谱面有ZIP和PEZ两种格式
