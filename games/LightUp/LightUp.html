@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>明灯谜境 · 点灯</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      user-select: none;
+    }
+
+    body {
+      background: linear-gradient(145deg, #1a2f1f 0%, #0e1a12 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+      padding: 12px;
+    }
+
+    #app {
+      width: min(800px, 100%);
+      background: #2d4533;
+      border-radius: 42px;
+      box-shadow: 0 20px 30px rgba(0,0,0,0.7), inset 0 0 0 1px #6f9e7c;
+      padding: 16px 14px 24px;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+    }
+    .screen.active {
+      display: flex;
+    }
+
+    .menu-container {
+      align-items: center;
+      gap: 20px;
+    }
+
+    h1 {
+      color: #f3e9c0;
+      text-shadow: 4px 4px 0 #1e3b28;
+      font-weight: 400;
+      letter-spacing: 4px;
+      font-size: 2.2rem;
+      margin: 5px 0 8px;
+      text-align: center;
+    }
+
+    .menu-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .btn {
+      background: #4c6b53;
+      border: none;
+      border-bottom: 4px solid #1e2f22;
+      color: #fcf9e7;
+      font-size: 1.3rem;
+      font-weight: bold;
+      padding: 12px 10px;
+      border-radius: 60px;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #142010, 0 4px 8px black;
+      transition: all 0.08s;
+      text-align: center;
+      letter-spacing: 2px;
+    }
+    .btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #142010, 0 4px 8px black;
+      border-bottom-width: 2px;
+    }
+
+    /* 分类标签栏 */
+    .category-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .category-btn {
+      background: #3d5a46;
+      border: none;
+      border-bottom: 3px solid #1e2f22;
+      color: #fcf9e7;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 6px 16px;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: all 0.08s;
+    }
+    .category-btn.active {
+      background: #e6c97e;
+      border-bottom-color: #b88b3a;
+      color: #2a3a1a;
+      transform: translateY(1px);
+    }
+    .category-btn:active {
+      transform: translateY(2px);
+    }
+
+    /* 关卡选择面板 */
+    .level-panel {
+      background: #1d2e21;
+      padding: 16px;
+      border-radius: 40px;
+      box-shadow: inset 0 2px 6px #0e140f, 0 6px 0 #0b130e;
+      width: 100%;
+      max-height: 450px;
+      overflow-y: auto;
+    }
+
+    /* 尺寸选择区域 */
+    .size-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 2px solid #4a6e52;
+      justify-content: center;
+    }
+    .size-btn {
+      background: #2a3a2e;
+      border: none;
+      border-bottom: 3px solid #1a2a1e;
+      color: #c0b28b;
+      font-size: 0.8rem;
+      font-weight: bold;
+      padding: 6px 12px;
+      border-radius: 28px;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      min-width: 50px;
+    }
+    .size-btn.active {
+      background: #e6c97e;
+      border-bottom-color: #b88b3a;
+      color: #2a3a1a;
+      transform: translateY(1px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .size-btn:hover:not(.active) {
+      background: #3d5a46;
+      color: #fcf9e7;
+    }
+    .size-btn:active {
+      transform: translateY(2px);
+    }
+
+    /* 关卡网格区域 */
+    .levels-container {
+      margin-top: 6px;
+    }
+    .levels-title {
+      color: #d4c48a;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+      padding-left: 4px;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .levels-title span {
+      background: #4a6e52;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+    }
+    .level-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 10px;
+    }
+
+    .level-btn {
+      background: #3d5a46;
+      border: none;
+      border-bottom: 4px solid #1e2f22;
+      color: #fcf9e7;
+      font-size: 0.9rem;
+      font-weight: bold;
+      padding: 10px 4px;
+      border-radius: 18px;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #142010;
+      transition: all 0.08s;
+      text-align: center;
+    }
+    .level-btn.completed {
+      background: #6b8f5e;
+      border-bottom-color: #3a5a2e;
+      position: relative;
+    }
+    .level-btn.completed::after {
+      content: "✓";
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      font-size: 10px;
+      background: #3a5a2e;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fcf9e7;
+    }
+    .level-btn.locked {
+      opacity: 0.5;
+      background: #2a3a2e;
+      cursor: not-allowed;
+    }
+    .level-btn:active:not(.locked) {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+    .level-btn small {
+      font-size: 0.65rem;
+      opacity: 0.8;
+      display: block;
+      margin-top: 3px;
+    }
+
+    /* 空状态提示 */
+    .empty-levels {
+      text-align: center;
+      color: #8aa87a;
+      padding: 30px 20px;
+      font-size: 0.85rem;
+    }
+
+    /* 灯数限制提示 */
+    .lights-limit {
+      background: #253b2b;
+      border-radius: 30px;
+      padding: 5px 12px;
+      margin-bottom: 12px;
+      text-align: center;
+      color: #f3eac2;
+      font-size: 0.85rem;
+    }
+    .lights-limit span {
+      color: #f5e98b;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    .lights-limit.exceed {
+      background: #a04444;
+      color: #ffd7d7;
+    }
+    .lights-limit.exceed span {
+      color: #ffd7d7;
+    }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #253b2b;
+      border-radius: 60px;
+      padding: 6px 12px 6px 18px;
+      margin-bottom: 14px;
+      box-shadow: inset 0 1px 4px #5b8263, 0 4px 0 #142010;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* 信息区域 - 关卡名和计时分开两个容器 */
+    .info-left {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .level-name {
+      color: #f3eac2;
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-shadow: 1px 1px 0 #1b2f1b;
+      background: #1d2e21;
+      padding: 4px 14px;
+      border-radius: 30px;
+    }
+    .level-time {
+      color: #d4c48a;
+      font-size: 1.2rem;
+      font-family: monospace;
+      letter-spacing: 1px;
+      background: #1d2e21;
+      padding: 4px 12px;
+      border-radius: 30px;
+    }
+
+    .toolbar-right {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* 移动端适配：调整图标按钮大小 */
+    .icon-btn {
+      background: #496e52;
+      border: none;
+      border-bottom: 3px solid #1d3622;
+      color: #f7f0d9;
+      font-size: 1.4rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 0 #122013;
+      transition: 0.05s linear;
+      font-weight: bold;
+    }
+    .icon-btn:active {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+
+    /* 移动端适配：盘面容器支持居中+滑动（修复滚动条无法滑到最左侧的问题） */
+    .board-wrapper {
+      display: flex;
+      margin: 8px 0;
+      overflow-x: auto;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      /* 关键修复：移除 justify-content: center，改为滚动容器默认左对齐 */
+      justify-content: flex-start;
+    }
+
+    /* 当内容未超出时，通过JS动态添加居中类 */
+    .board-wrapper.center-mode {
+      justify-content: center;
+    }
+
+    .board-grid {
+      display: grid;
+      background: #1e3225;
+      padding: 8px;
+      border-radius: 20px;
+      box-shadow: inset 0 0 0 2px #56855e, 0 8px 0 #0c1a0f;
+      gap: 2px;
+      /* 让 grid 根据内容自动扩展宽度 */
+      width: max-content;
+      min-width: min-content;
+    }
+
+    /* 移动端格子稍微缩小以适应小屏幕 */
+    .cell {
+      width: min(7vw, 42px);
+      height: min(7vw, 42px);
+      max-width: 42px;
+      max-height: 42px;
+      min-width: 28px;
+      min-height: 28px;
+      background: #dcedc4;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      box-shadow: inset 0 -2px 0 #7a9e7e, 0 1px 0 #0f1f12;
+      cursor: pointer;
+      transition: 0.04s;
+      color: #1e3f26;
+    }
+    .cell.obstacle {
+      background: #3b2f1f;
+      box-shadow: inset 0 -2px 0 #6b5d45, 0 1px 0 #0f1f12;
+      color: #ebdbbd;
+    }
+    .cell.number {
+      background: #5d6e4a;
+      color: #fbf3d5;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-shadow: 1px 1px 0 #2e412e;
+    }
+    .cell.number.invalid {
+      background: #a04444;
+      color: #ffd7d7;
+      text-shadow: 1px 1px 0 #4a2020;
+    }
+    .cell.mirror {
+      background: #7a9eb3;
+      color: #1a2f3a;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+    .cell.scatter {
+      background: #b8a45e;
+      color: #3a2e0e;
+      font-size: 1.2rem;
+    }
+    .cell.light {
+      background: #f5e98b;
+      box-shadow: inset 0 -2px 0 #bcb05e, 0 1px 0 #5c6e3a;
+      color: #322e0e;
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+    .cell.light.invalid-light {
+      background: #a04444;
+      box-shadow: inset 0 -2px 0 #6b2a2a, 0 1px 0 #5c6e3a;
+      color: #ffd7d7;
+    }
+    .cell.illuminated {
+      background: #f5e98b;
+    }
+    .cell.mirror.illuminated {
+      background: #a8d4c4;
+    }
+    .cell.scatter.illuminated {
+      background: #d4c48a;
+    }
+
+    .game-footer {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      color: #c0b28b;
+      font-size: 0.7rem;
+      text-align: center;
+      flex-wrap: wrap;
+    }
+
+    /* 规则弹窗移动端适配 */
+    .rules-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+    .rules-content {
+      background: #2d4533;
+      padding: 24px;
+      border-radius: 36px;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 0 #142010;
+    }
+    .rules-content h2 {
+      color: #f3e9c0;
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .rules-content h3 {
+      color: #d4c48a;
+      font-size: 1.2rem;
+      margin: 12px 0 8px;
+    }
+    .rules-content p {
+      color: #c0b28b;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    .rules-content .highlight {
+      color: #f5e98b;
+    }
+
+    /* 胜利弹窗移动端适配 */
+    .victory-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .victory-content {
+      background: #2d4533;
+      padding: 24px;
+      border-radius: 36px;
+      text-align: center;
+      box-shadow: 0 8px 0 #142010;
+      max-width: 90%;
+    }
+    .victory-content h2 {
+      color: #f3e9c0;
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+    }
+    .victory-content p {
+      color: #c0b28b;
+      font-size: 1rem;
+      margin-bottom: 16px;
+    }
+
+    /* 美化滚动条 */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #1d2e21;
+        border-radius: 6px;
+        margin: 2px;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #6b8f5e;
+        border-radius: 6px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #8bb07a;
+    }
+    .level-panel::-webkit-scrollbar-track {
+        background: #0e1a12;
+    }
+    .level-panel::-webkit-scrollbar-thumb {
+        background: #4c6b53;
+    }
+    .level-panel::-webkit-scrollbar-thumb:hover {
+        background: #6b8f5e;
+    }
+    .rules-content::-webkit-scrollbar-track {
+        background: #1d2e21;
+    }
+    .rules-content::-webkit-scrollbar-thumb {
+        background: #6b8f5e;
+    }
+    .rules-content::-webkit-scrollbar-thumb:hover {
+        background: #8bb07a;
+    }
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: #6b8f5e #1d2e21;
+    }
+
+    /* 小屏幕进一步优化 */
+    @media (max-width: 550px) {
+      #app {
+        padding: 12px 10px 20px;
+      }
+      h1 {
+        font-size: 1.8rem;
+        letter-spacing: 3px;
+      }
+      .icon-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1.2rem;
+        border-radius: 20px;
+      }
+      .level-name {
+        font-size: 1rem;
+        padding: 3px 12px;
+      }
+      .level-time {
+        font-size: 0.85rem;
+        padding: 3px 10px;
+      }
+      .cell {
+        width: min(8vw, 36px);
+        height: min(8vw, 36px);
+        min-width: 26px;
+        min-height: 26px;
+        font-size: 0.9rem;
+      }
+      .cell.mirror {
+        font-size: 1.2rem;
+      }
+      .cell.light {
+        font-size: 1.2rem;
+      }
+      .level-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: 8px;
+      }
+      .level-btn {
+        font-size: 0.8rem;
+        padding: 8px 4px;
+      }
+      .level-btn small {
+        font-size: 0.6rem;
+      }
+      .size-btn {
+        font-size: 0.7rem;
+        padding: 5px 10px;
+        min-width: 44px;
+      }
+      .category-btn {
+        font-size: 0.7rem;
+        padding: 5px 14px;
+      }
+      .btn {
+        font-size: 1.1rem;
+        padding: 10px 10px;
+      }
+      .lights-limit {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+      }
+      .lights-limit span {
+        font-size: 1rem;
+      }
+      .game-footer {
+        font-size: 0.6rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .toolbar-right {
+        gap: 6px;
+      }
+      .icon-btn {
+        width: 25px;
+        height: 25px;
+        font-size: 1rem;
+      }
+      .level-name {
+        font-size: 0.9rem;
+      }
+      .level-time {
+        font-size: 0.75rem;
+      }
+      .cell {
+        width: min(9vw, 32px);
+        height: min(9vw, 32px);
+        min-width: 24px;
+        min-height: 24px;
+        font-size: 0.8rem;
+      }
+      .cell.mirror {
+        font-size: 1rem;
+      }
+      .cell.light {
+        font-size: 1rem;
+      }
+      .level-btn {
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div id="mainScreen" class="screen menu-container active">
+    <h1>· 点 灯 ·</h1>
+    <div class="menu-buttons">
+      <button class="btn" id="selectLevelBtn">📋 选择关卡</button>
+      <button class="btn" id="rulesBtn">📘 规则介绍</button>
+    </div>
+  </div>
+
+  <div id="levelScreen" class="screen menu-container">
+    <h1>选择关卡</h1>
+    <div class="category-tabs" id="categoryTabs"></div>
+    <div class="level-panel">
+      <div id="levelGrid"></div>
+    </div>
+    <div style="margin-top: 16px;">
+      <button class="btn" id="backToMainBtn">↩ 返回</button>
+    </div>
+  </div>
+
+  <div id="gameScreen" class="screen">
+    <div class="game-header">
+      <div class="info-left">
+        <span class="level-name" id="levelNameDisplay">关卡1</span>
+        <span class="level-time" id="levelTimeDisplay">00:00.00</span>
+      </div>
+      <div class="toolbar-right">
+        <button class="icon-btn" id="undoBtn" title="撤销">↩</button>
+        <button class="icon-btn" id="resetBtn" title="重置">⟲</button>
+        <button class="icon-btn" id="exitGameBtn" title="退出">✕</button>
+      </div>
+    </div>
+    <div class="lights-limit" id="lightsLimitDisplay">
+      💡 已放置灯数: <span id="currentLightsCount">0</span> / <span id="maxLightsLimit">0</span>
+    </div>
+    <div class="board-wrapper" id="boardWrapper">
+      <div class="board-grid" id="boardGrid"></div>
+    </div>
+    <div class="game-footer">
+      <span>点击空格放置/取消💡 · 红字数字表示不满足 · 红色灯泡表示被其他灯光照射</span>
+    </div>
+  </div>
+
+  <div class="rules-modal" id="rulesModal">
+    <div class="rules-content">
+      <h2>📘 明灯规则</h2>
+      <h3>🎯 游戏目标</h3>
+      <p>在空白格放置灯💡，照亮所有非障碍/数字格。</p>
+      <h3>💡 灯光规则</h3>
+      <p>灯光向上下左右四个方向直线延伸，被障碍🧱或数字挡住。</p>
+      <h3>🔢 数字块</h3>
+      <p>数字表示相邻四格（上下左右）需要放置的灯数(0~4)。<br>红色数字表示当前灯数不满足要求。</p>
+      <h3>🪞 镜面</h3>
+      <p><span class="highlight">╱</span>（左下-右上）：平行光线继续传播，垂直光线原路返回<br>
+      <span class="highlight">╲</span>（左上-右下）：平行光线继续传播，垂直光线原路返回<br>
+      光线经过镜面时，会点亮镜面所在格。</p>
+      <h3>✨ 散射</h3>
+      <p><span class="highlight">۞</span>：光线经过时点亮该格，并分裂为两束斜45度光线继续传播。</p>
+      <h3>⚠️ 限制</h3>
+      <p>每盏灯不能被其他灯的光线照射。红色灯泡表示违反规则。</p>
+      <button class="btn" id="closeRulesBtn" style="margin-top:16px;">知道了</button>
+    </div>
+  </div>
+
+  <div class="victory-modal" id="victoryModal">
+    <div class="victory-content">
+      <h2>✨ 通关成功 ✨</h2>
+      <p id="victoryMessage"></p>
+      <button class="btn" id="nextLevelBtn">下一关</button>
+      <button class="btn" id="backToLevelBtn" style="margin-top:8px;">返回选关</button>
+    </div>
+  </div>
+</div>
+
+<script src="levels.js"></script>
+<script>
+  (function(){
+    "use strict";
+
+    // ---------- 全局变量 ----------
+    let currentScreen = 'main';
+    const mainScreen = document.getElementById('mainScreen');
+    const levelScreen = document.getElementById('levelScreen');
+    const gameScreen = document.getElementById('gameScreen');
+    const victoryModal = document.getElementById('victoryModal');
+    const victoryMessage = document.getElementById('victoryMessage');
+    const rulesModal = document.getElementById('rulesModal');
+    
+    let currentLevel = 1;
+    let currentCategory = 'regular';
+    let currentMaxLights = 0;
+    let boardWidth = 10, boardHeight = 10;
+    let grid = [];
+    let lights = [];              
+    let illuminated = [];         
+    let historyStack = [];        
+    let startTime = null;
+    let timerInterval = null;
+    let elapsedSeconds = 0;
+    let gameActive = false;
+    let currentMoves = 0;
+    let invalidLights = new Set();
+    
+    let completedLevels = new Set();
+
+    const boardGridEl = document.getElementById('boardGrid');
+    const boardWrapper = document.getElementById('boardWrapper');
+    const levelNameDisplay = document.getElementById('levelNameDisplay');
+    const levelTimeDisplay = document.getElementById('levelTimeDisplay');
+    const lightsLimitDisplay = document.getElementById('lightsLimitDisplay');
+    const currentLightsCountSpan = document.getElementById('currentLightsCount');
+    const maxLightsLimitSpan = document.getElementById('maxLightsLimit');
+    
+    // ---------- 辅助函数：检测盘面是否需要滚动并调整居中 ----------
+    function updateBoardWrapperScrollMode() {
+      if (!boardWrapper || !boardGridEl) return;
+      const wrapperWidth = boardWrapper.clientWidth;
+      const gridWidth = boardGridEl.scrollWidth;
+      
+      if (gridWidth > wrapperWidth) {
+        // 超出容器，移除居中类，允许滚动
+        boardWrapper.classList.remove('center-mode');
+      } else {
+        // 未超出容器，添加居中类
+        boardWrapper.classList.add('center-mode');
+      }
+    }
+    
+    // ---------- 辅助函数 ----------
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      const cs = Math.floor((sec - Math.floor(sec)) * 100);
+      return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}.${cs.toString().padStart(2,'0')}`;
+    }
+
+    function updateInfoDisplay() {
+      // 新格式：R-8-1，需要解析出序号
+      const parts = currentLevel.split('-');
+      const num = parts[2];  // 关卡序号
+      levelNameDisplay.textContent = `关卡${num}`
+      levelTimeDisplay.textContent = formatTime(elapsedSeconds);
+      
+      if (gameActive) {
+        const lightCount = countCurrentLights();
+        currentLightsCountSpan.textContent = lightCount;
+        if (lightCount > currentMaxLights) {
+          lightsLimitDisplay.classList.add('exceed');
+        } else {
+          lightsLimitDisplay.classList.remove('exceed');
+        }
+      }
+    }
+    
+    function countCurrentLights() {
+      let cnt = 0;
+      for (let r = 0; r < boardHeight; r++) {
+        for (let c = 0; c < boardWidth; c++) {
+          if (lights[r][c]) cnt++;
+        }
+      }
+      return cnt;
+    }
+
+    function stopTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = null;
+    }
+
+    function startTimer() {
+      if (timerInterval) return;
+      startTime = Date.now() - elapsedSeconds * 1000;
+      timerInterval = setInterval(() => {
+        elapsedSeconds = (Date.now() - startTime) / 1000;
+        updateInfoDisplay();
+      }, 10);
+    }
+
+    function resetTimer() {
+      stopTimer();
+      elapsedSeconds = 0;
+      updateInfoDisplay();
+      if (gameActive) startTimer();
+    }
+
+    // 方向定义
+    const DIRS = {
+      'up': [-1, 0],
+      'down': [1, 0],
+      'left': [0, -1],
+      'right': [0, 1],
+      'up-left': [-1, -1],
+      'up-right': [-1, 1],
+      'down-left': [1, -1],
+      'down-right': [1, 1]
+    };
+
+    const MIRROR_REFLECT = {
+      '╱': {
+        'up': 'right',
+        'down': 'left',
+        'left': 'down',
+        'right': 'up',
+        'up-left': 'down-right',
+        'up-right': 'up-right',
+        'down-left': 'down-left',
+        'down-right': 'up-left'
+      },
+      '╲': {
+        'up': 'left',
+        'down': 'right',
+        'left': 'up',
+        'right': 'down',
+        'up-left': 'up-left',
+        'up-right': 'down-left',
+        'down-left': 'up-right',
+        'down-right': 'down-right'
+      }
+    };
+
+    const SCATTER_SPLIT = {
+      'up': ['up-left', 'up-right'],
+      'down': ['down-left', 'down-right'],
+      'left': ['up-left', 'down-left'],
+      'right': ['up-right', 'down-right'],
+      'up-left': ['up', 'left'],
+      'up-right': ['up', 'right'],
+      'down-left': ['down', 'left'],
+      'down-right': ['down', 'right']
+    };
+
+    function computeIllumination() {
+      const h = boardHeight, w = boardWidth;
+      const ill = Array(h).fill().map(() => Array(w).fill(false));
+      const visited = new Set();
+      
+      const queue = [];
+      for (let r = 0; r < h; r++) {
+        for (let c = 0; c < w; c++) {
+          if (lights[r][c]) {
+            ill[r][c] = true;
+            for (let dir of ['up', 'down', 'left', 'right']) {
+              queue.push({ r, c, dir });
+            }
+          }
+        }
+      }
+      
+      while (queue.length > 0) {
+        const { r, c, dir } = queue.shift();
+        const stateKey = `${r},${c},${dir}`;
+        if (visited.has(stateKey)) continue;
+        visited.add(stateKey);
+        
+        const [dr, dc] = DIRS[dir];
+        if (!dr && !dc) continue;
+        
+        let nr = r + dr, nc = c + dc;
+        if (nr < 0 || nr >= h || nc < 0 || nc >= w) continue;
+        
+        const cell = grid[nr][nc];
+        ill[nr][nc] = true;
+        
+        if (cell === 'obstacle' || cell.startsWith('number')) {
+          continue;
+        }
+        
+        if (cell === 'mirror1' || cell === 'mirror2') {
+          const mirrorType = cell === 'mirror1' ? '╱' : '╲';
+          if (MIRROR_REFLECT[mirrorType][dir]) {
+            const newDir = MIRROR_REFLECT[mirrorType][dir];
+            queue.push({ r: nr, c: nc, dir: newDir });
+          }
+          continue;
+        }
+        
+        if (cell === 'scatter') {
+          if (SCATTER_SPLIT[dir]) {
+            for (let newDir of SCATTER_SPLIT[dir]) {
+              queue.push({ r: nr, c: nc, dir: newDir });
+            }
+          }
+          continue;
+        }
+        
+        queue.push({ r: nr, c: nc, dir });
+      }
+      
+      return ill;
+    }
+    
+    function computeInvalidLights() {
+      invalidLights.clear();
+      for (let r = 0; r < boardHeight; r++) {
+        for (let c = 0; c < boardWidth; c++) {
+          if (lights[r][c]) {
+            const lightsWithoutCurrent = lights.map(row => [...row]);
+            lightsWithoutCurrent[r][c] = false;
+            const illWithoutCurrent = computeIlluminationWithLights(lightsWithoutCurrent);
+            if (illWithoutCurrent[r][c]) {
+              invalidLights.add(`${r},${c}`);
+            }
+          }
+        }
+      }
+    }
+    
+    function computeIlluminationWithLights(lightsMat) {
+      const h = boardHeight, w = boardWidth;
+      const ill = Array(h).fill().map(() => Array(w).fill(false));
+      const visited = new Set();
+      
+      const queue = [];
+      for (let r = 0; r < h; r++) {
+        for (let c = 0; c < w; c++) {
+          if (lightsMat[r][c]) {
+            ill[r][c] = true;
+            for (let dir of ['up', 'down', 'left', 'right']) {
+              queue.push({ r, c, dir });
+            }
+          }
+        }
+      }
+      
+      while (queue.length > 0) {
+        const { r, c, dir } = queue.shift();
+        const stateKey = `${r},${c},${dir}`;
+        if (visited.has(stateKey)) continue;
+        visited.add(stateKey);
+        
+        const [dr, dc] = DIRS[dir];
+        if (!dr && !dc) continue;
+        
+        let nr = r + dr, nc = c + dc;
+        if (nr < 0 || nr >= h || nc < 0 || nc >= w) continue;
+        
+        const cell = grid[nr][nc];
+        ill[nr][nc] = true;
+        
+        if (cell === 'obstacle' || cell.startsWith('number')) {
+          continue;
+        }
+        
+        if (cell === 'mirror1' || cell === 'mirror2') {
+          const mirrorType = cell === 'mirror1' ? '╱' : '╲';
+          if (MIRROR_REFLECT[mirrorType][dir]) {
+            const newDir = MIRROR_REFLECT[mirrorType][dir];
+            queue.push({ r: nr, c: nc, dir: newDir });
+          }
+          continue;
+        }
+        
+        if (cell === 'scatter') {
+          if (SCATTER_SPLIT[dir]) {
+            for (let newDir of SCATTER_SPLIT[dir]) {
+              queue.push({ r: nr, c: nc, dir: newDir });
+            }
+          }
+          continue;
+        }
+        
+        queue.push({ r: nr, c: nc, dir });
+      }
+      
+      return ill;
+    }
+
+    function getInvalidNumbers() {
+      const invalid = [];
+      for (let r = 0; r < boardHeight; r++) {
+        for (let c = 0; c < boardWidth; c++) {
+          const cell = grid[r][c];
+          if (cell.startsWith('number')) {
+            const target = parseInt(cell.split(':')[1]);
+            let cnt = 0;
+            [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dr,dc])=>{
+              const nr = r+dr, nc = c+dc;
+              if (nr>=0 && nr<boardHeight && nc>=0 && nc<boardWidth && lights[nr][nc]) cnt++;
+            });
+            if (cnt !== target) invalid.push([r,c]);
+          }
+        }
+      }
+      return invalid;
+    }
+
+    function renderBoard() {
+      const h = boardHeight, w = boardWidth;
+      boardGridEl.style.gridTemplateColumns = `repeat(${w}, 1fr)`;
+      boardGridEl.innerHTML = '';
+      const ill = illuminated;
+      const invalidSet = new Set(getInvalidNumbers().map(p => `${p[0]},${p[1]}`));
+      
+      for (let r = 0; r < h; r++) {
+        for (let c = 0; c < w; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          const cellType = grid[r][c];
+          const hasLight = lights[r][c];
+          const isLit = ill[r][c];
+          const isInvalidLight = hasLight && invalidLights.has(`${r},${c}`);
+          
+          if (cellType === 'obstacle') {
+            cell.classList.add('obstacle');
+            cell.textContent = '🧱';
+          } else if (cellType.startsWith('number')) {
+            cell.classList.add('number');
+            const num = cellType.split(':')[1];
+            cell.textContent = num;
+            if (invalidSet.has(`${r},${c}`)) {
+              cell.classList.add('invalid');
+            }
+          } else if (cellType === 'mirror1') {
+            cell.classList.add('mirror');
+            cell.textContent = '╱';
+            if (isLit) cell.classList.add('illuminated');
+          } else if (cellType === 'mirror2') {
+            cell.classList.add('mirror');
+            cell.textContent = '╲';
+            if (isLit) cell.classList.add('illuminated');
+          } else if (cellType === 'scatter') {
+            cell.classList.add('scatter');
+            cell.textContent = '۞';
+            if (isLit) cell.classList.add('illuminated');
+          } else {
+            if (hasLight) {
+              cell.classList.add('light');
+              if (isInvalidLight) {
+                cell.classList.add('invalid-light');
+              }
+              cell.textContent = '💡';
+            } else {
+              cell.textContent = '';
+              if (isLit) cell.classList.add('illuminated');
+            }
+          }
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+          cell.addEventListener('click', onCellClick);
+          boardGridEl.appendChild(cell);
+        }
+      }
+      updateInfoDisplay();
+      // 渲染完成后更新滚动模式
+      setTimeout(updateBoardWrapperScrollMode, 10);
+    }
+
+    function onCellClick(e) {
+      if (!gameActive) return;
+      const row = parseInt(e.currentTarget.dataset.row);
+      const col = parseInt(e.currentTarget.dataset.col);
+      const cell = grid[row][col];
+      
+      if (cell !== 'empty') return;
+      
+      const hasLight = lights[row][col];
+      
+      historyStack.push({ lights: lights.map(r=>[...r]) });
+      
+      if (hasLight) {
+        lights[row][col] = false;
+        currentMoves = Math.max(0, currentMoves-1);
+      } else {
+        const newLightCount = countCurrentLights() + 1;
+        if (newLightCount > currentMaxLights) {
+          historyStack.pop();
+          return;
+        }
+        lights[row][col] = true;
+        currentMoves++;
+      }
+      
+      illuminated = computeIllumination();
+      computeInvalidLights();
+      renderBoard();
+      
+      if (checkVictory()) {
+        handleVictory();
+      }
+    }
+
+    function checkVictory() {
+      for (let r = 0; r < boardHeight; r++) {
+        for (let c = 0; c < boardWidth; c++) {
+          if (grid[r][c] === 'empty' && !illuminated[r][c]) return false;
+        }
+      }
+      if (getInvalidNumbers().length !== 0) return false;
+      if (invalidLights.size !== 0) return false;
+      return true;
+    }
+
+    function handleVictory() {
+      if (!gameActive) return;
+      gameActive = false;
+      stopTimer();
+      
+      markLevelCompleted(currentLevel);
+      
+      victoryMessage.textContent = `关卡${currentLevel}完成！\n用时 ${formatTime(elapsedSeconds)}  步数 ${currentMoves}`;
+      victoryModal.style.display = 'flex';
+      
+      renderLevelGrid();
+    }
+
+    function exitToLevelSelect() {
+      if (gameActive) {
+        gameActive = false;
+        stopTimer();
+      }
+      victoryModal.style.display = 'none';
+      gameScreen.classList.remove('active');
+      levelScreen.classList.add('active');
+      currentScreen = 'level';
+      renderLevelGrid();
+    }
+
+    function undo() {
+      if (!gameActive) return;
+      if (historyStack.length === 0) return;
+      const prev = historyStack.pop();
+      lights = prev.lights.map(r=>[...r]);
+      currentMoves = Math.max(0, currentMoves-1);
+      illuminated = computeIllumination();
+      computeInvalidLights();
+      renderBoard();
+    }
+
+    function resetBoard() {
+      if (!gameActive) return;
+      lights = Array(boardHeight).fill().map(() => Array(boardWidth).fill(false));
+      historyStack = [];
+      currentMoves = 0;
+      illuminated = computeIllumination();
+      computeInvalidLights();
+      renderBoard();
+    }
+
+    function loadLevel(levelId, categoryId) {
+      const category = LEVELS_CATEGORIES[categoryId];
+      if (!category) return false;
+
+      // 新格式：R-8-1 或 M-10-2，需要解析出尺寸和关卡序号
+      // 格式为：分类前缀-尺寸-序号
+      const parts = levelId.split('-');
+      const size = parts[1];  // 尺寸
+      const levelNum = parts[2];  // 关卡序号
+  
+      const levelData = category.sizes[size]?.[levelNum];
+      if (!levelData) return false;
+
+      boardWidth = levelData.width;
+      boardHeight = levelData.height;
+      grid = levelData.grid.map(row => [...row]);
+      lights = Array(boardHeight).fill().map(() => Array(boardWidth).fill(false));
+      historyStack = [];
+      currentMoves = 0;
+      currentLevel = levelId;
+      currentCategory = categoryId;
+      currentMaxLights = levelData.maxLights || 999;
+      maxLightsLimitSpan.textContent = currentMaxLights;
+      illuminated = computeIllumination();
+      computeInvalidLights();
+      gameActive = true;
+      resetTimer();
+      renderBoard();
+      updateInfoDisplay();
+
+      return true;
+    }
+
+    function startLevel(categoryId, levelId) {
+      if (loadLevel(levelId, categoryId)) {
+        levelScreen.classList.remove('active');
+        gameScreen.classList.add('active');
+        currentScreen = 'game';
+        // 进入游戏后更新滚动模式
+        setTimeout(updateBoardWrapperScrollMode, 50);
+      }
+    }
+
+    function loadCompletedLevels() {
+      const stored = localStorage.getItem('lightup_completed_v2');
+      if (stored) {
+        completedLevels = new Set(JSON.parse(stored));
+      }
+    }
+    
+    function saveCompletedLevels() {
+      localStorage.setItem('lightup_completed_v2', JSON.stringify([...completedLevels]));
+    }
+    
+    function isLevelCompleted(categoryId, levelId) {
+      return completedLevels.has(`${categoryId}_${levelId}`);
+    }
+    
+    function markLevelCompleted(levelId) {
+      completedLevels.add(`${currentCategory}_${levelId}`);
+      saveCompletedLevels();
+    }
+    
+    function isLevelUnlocked(categoryId, levelId) {
+      return true;
+    }
+
+    let currentViewCategory = 'regular';
+    let currentViewSize = 8;
+    
+    function renderLevelGrid() {
+      const levelContainer = document.getElementById('levelGrid');
+      const category = LEVELS_CATEGORIES[currentViewCategory];
+      if (!category) return;
+  
+      const sizes = Object.keys(category.sizes).map(Number).sort((a, b) => a - b);
+  
+      // 尺寸选择器
+      let html = `<div class="size-selector">`;
+      for (let size of sizes) {
+        const activeClass = currentViewSize === size ? 'active' : '';
+        html += `<button class="size-btn ${activeClass}" data-size="${size}">${size}×${size}</button>`;
+      }
+      html += `</div>`;
+  
+      // 关卡区域
+      html += `<div class="levels-container">`;
+      const sizeLevels = category.sizes[currentViewSize];
+      if (sizeLevels && Object.keys(sizeLevels).length > 0) {
+        html += `<div class="levels-title">
+          <span>📦 当前尺寸</span> ${currentViewSize}×${currentViewSize} · 共 ${Object.keys(sizeLevels).length} 个关卡
+        </div>`;
+        html += `<div class="level-grid">`;
+        const levelNumbers = Object.keys(sizeLevels).map(Number).sort((a, b) => a - b);
+        for (let levelNum of levelNumbers) {
+          const level = sizeLevels[levelNum];
+          const completed = isLevelCompleted(currentViewCategory, level.id);
+          const btnClass = completed ? 'level-btn completed' : 'level-btn';
+          html += `<button class="${btnClass}" data-level-id="${level.id}">
+            ${level.displayName}<br><small>${level.width}×${level.height}</small>
+          </button>`;
+        }
+        html += `</div>`;
+      } else {
+        html += `<div class="empty-levels">
+          ✨ 暂无关卡<br><small>请在 levels.js 中添加更多关卡</small>
+        </div>`;
+      }
+      html += `</div>`;
+  
+      levelContainer.innerHTML = html;
+  
+      // 绑定尺寸按钮事件
+      document.querySelectorAll('.size-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          currentViewSize = parseInt(e.currentTarget.dataset.size);
+          renderLevelGrid();
+        });
+      });
+  
+      // 绑定关卡按钮事件
+      document.querySelectorAll('.level-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const levelId = e.currentTarget.dataset.levelId;
+          startLevel(currentViewCategory, levelId);
+        });
+      });
+    }    
+    
+    function renderCategoryTabs() {
+      const tabsContainer = document.getElementById('categoryTabs');
+      const categories = ['regular', 'mirror', 'scatter', 'mixed'];
+      const categoryNames = { regular: '📖 常规', mirror: '🪞 镜面', scatter: '✨ 散射', mixed: '🌀 综合' };
+      
+      let html = '';
+      for (let cat of categories) {
+        const activeClass = currentViewCategory === cat ? 'active' : '';
+        html += `<button class="category-btn ${activeClass}" data-category="${cat}">${categoryNames[cat]}</button>`;
+      }
+      tabsContainer.innerHTML = html;
+      
+      document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const category = e.currentTarget.dataset.category;
+          currentViewCategory = category;
+          currentViewSize = 8;
+          renderCategoryTabs();
+          renderLevelGrid();
+        });
+      });
+    }
+
+    function nextLevel() {
+      const category = LEVELS_CATEGORIES[currentCategory];
+      const parts = currentLevel.split('-');
+      const prefix = parts[0];  // R, M, S, C
+      const currentSize = parts[1];
+      const currentNum = parseInt(parts[2]);
+      const nextNum = currentNum + 1;
+      const nextLevelId = `${prefix}-${currentSize}-${nextNum}`;
+  
+      if (category.sizes[currentSize]?.[nextNum]) {
+        victoryModal.style.display = 'none';
+        if (loadLevel(nextLevelId, currentCategory)) {
+          currentLevel = nextLevelId;
+          gameActive = true;
+          resetTimer();
+          renderBoard();
+          updateInfoDisplay();
+        }
+      } else {
+        alert('恭喜！你已完成当前尺寸的所有关卡！');
+        victoryModal.style.display = 'none';
+        exitToLevelSelect();
+      }
+    }    
+
+    function init() {
+      loadCompletedLevels();
+      renderCategoryTabs();
+      
+      document.getElementById('selectLevelBtn').addEventListener('click', ()=>{
+        mainScreen.classList.remove('active');
+        levelScreen.classList.add('active');
+        currentScreen = 'level';
+        renderLevelGrid();
+      });
+      
+      document.getElementById('rulesBtn').addEventListener('click', ()=>{
+        rulesModal.style.display = 'flex';
+      });
+      
+      document.getElementById('closeRulesBtn').addEventListener('click', ()=>{
+        rulesModal.style.display = 'none';
+      });
+      
+      rulesModal.addEventListener('click', (e) => {
+        if (e.target === rulesModal) {
+          rulesModal.style.display = 'none';
+        }
+      });
+      
+      document.getElementById('backToMainBtn').addEventListener('click', ()=>{
+        levelScreen.classList.remove('active');
+        mainScreen.classList.add('active');
+        currentScreen = 'main';
+      });
+      
+      document.getElementById('undoBtn').addEventListener('click', undo);
+      document.getElementById('resetBtn').addEventListener('click', resetBoard);
+      document.getElementById('exitGameBtn').addEventListener('click', ()=>{
+        if (gameActive) {
+          gameActive = false;
+          stopTimer();
+        }
+        gameScreen.classList.remove('active');
+        levelScreen.classList.add('active');
+        currentScreen = 'level';
+        renderLevelGrid();
+      });
+      
+      document.getElementById('nextLevelBtn').addEventListener('click', nextLevel);
+      document.getElementById('backToLevelBtn').addEventListener('click', ()=>{
+        victoryModal.style.display = 'none';
+        exitToLevelSelect();
+      });
+      
+      victoryModal.addEventListener('click', (e) => {
+        if (e.target === victoryModal) {
+          victoryModal.style.display = 'none';
+          exitToLevelSelect();
+        }
+      });
+      
+      // 监听窗口大小变化，重新检测滚动模式
+      window.addEventListener('resize', () => {
+        setTimeout(updateBoardWrapperScrollMode, 50);
+      });
+    }
+
+    init();
+  })();
+</script>
+</body>
+</html>

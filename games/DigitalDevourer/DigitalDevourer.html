@@ -1307,47 +1307,73 @@ move(dir) {
         setTimeout(() => adjustScrollContainerAlignment(), 20);
     }
 
-    function resetGame() {
+    // 重置游戏（带确认弹窗）
+    async function resetGame() {
         if (!currentGame) return;
-        currentGame.resetToInitial();
-        timerSeconds = 0;
-        if (timerInterval) stopTimer();
-        startTimer();
-        isGameActive = true;
-        refreshGameUI();
-        setTimeout(() => centerBoardInScroll(), 100);
-        showDialog('盘面已重置为初始状态', '重置成功', 'success');
+        
+        // 弹出确认对话框，询问用户是否重置
+        const confirmed = await showConfirm('盘面将会重置为初始状态，当前进度将丢失。是否继续？', '重置确认');
+        
+        if (confirmed) {
+            currentGame.resetToInitial();
+            timerSeconds = 0;
+            if (timerInterval) stopTimer();
+            startTimer();
+            isGameActive = true;
+            refreshGameUI();
+            setTimeout(() => centerBoardInScroll(), 100);
+            showDialog('盘面已重置为初始状态', '重置成功', 'success');
+        }
     }
 
+    // 提交游戏（带确认弹窗）
     async function submitGame() {
         if (!currentGame || !isGameActive) return;
-        const finalScore = currentGame.getScore();
-        const steps = currentGame.getSteps();
-        const recordSnapshot = currentGame.getInitialSnapshot();
         
-        addOrUpdateHistoryRecord(currentRows, currentCols, timerSeconds, steps, finalScore, recordSnapshot);
+        // 弹出确认对话框，询问用户是否提交
+        const confirmed = await showConfirm(`当前得分：${currentGame.getScore()}，步数：${currentGame.getSteps()}，用时：${timerSeconds}秒。\n提交后盘面将会重置，是否继续？`, '提交确认');
         
-        await showDialog(`提交成功！\n得分:${finalScore}\n步数:${steps}\n用时:${timerSeconds}秒`, '成绩已保存', 'success');
-        
-        currentGame.resetToInitial();
-        timerSeconds = 0;
-        startTimer();
-        refreshGameUI();
-        setTimeout(() => centerBoardInScroll(), 100);
-    }
-
-    async function exitToMain() {
-        if (currentGame && isGameActive) {
+        if (confirmed) {
             const finalScore = currentGame.getScore();
             const steps = currentGame.getSteps();
             const recordSnapshot = currentGame.getInitialSnapshot();
             
             addOrUpdateHistoryRecord(currentRows, currentCols, timerSeconds, steps, finalScore, recordSnapshot);
-            await showDialog(`退出游戏\n步数:${steps}\n得分:${finalScore}\n记录已保存`, '游戏退出', 'info');
+            
+            await showDialog(`提交成功！\n得分:${finalScore}\n步数:${steps}\n用时:${timerSeconds}秒`, '成绩已保存', 'success');
+            
+            currentGame.resetToInitial();
+            timerSeconds = 0;
+            startTimer();
+            refreshGameUI();
+            setTimeout(() => centerBoardInScroll(), 100);
         }
-        stopTimer();
-        isGameActive = false;
-        showMainMenu();
+    }
+
+    // 退出游戏（带确认弹窗，且退出时自动提交分数）
+    async function exitToMain() {
+        if (currentGame && isGameActive) {
+            // 弹出确认对话框，提示退出将自动保存成绩
+            const confirmed = await showConfirm(`退出游戏后，当前成绩（得分：${currentGame.getScore()}，步数：${currentGame.getSteps()}）将自动保存。\n是否确定退出？`, '退出确认');
+            
+            if (confirmed) {
+                const finalScore = currentGame.getScore();
+                const steps = currentGame.getSteps();
+                const recordSnapshot = currentGame.getInitialSnapshot();
+                
+                addOrUpdateHistoryRecord(currentRows, currentCols, timerSeconds, steps, finalScore, recordSnapshot);
+                await showDialog(`游戏已退出\n步数:${steps}\n得分:${finalScore}\n记录已保存`, '游戏退出', 'info');
+                
+                stopTimer();
+                isGameActive = false;
+                showMainMenu();
+            }
+        } else {
+            // 如果没有进行中的游戏，直接退出到主菜单
+            stopTimer();
+            isGameActive = false;
+            showMainMenu();
+        }
     }
 
     // 历史记录弹窗
