@@ -522,6 +522,158 @@
       margin-bottom: 16px;
     }
 
+    /* 游玩记录弹窗 */
+    .records-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .records-content {
+      background: #2d4533;
+      border-radius: 40px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: 0 10px 0 #142010;
+    }
+    .records-content h2 {
+      color: #f3e9c0;
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+      text-align: center;
+      border-bottom: 2px solid #4a6e52;
+      padding-bottom: 10px;
+    }
+    .records-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .record-item {
+      background: #1d2e21;
+      border-radius: 20px;
+      padding: 12px;
+      border-left: 4px solid #f5e98b;
+    }
+    .record-name {
+      color: #f5e98b;
+      font-size: 1rem;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+    .record-info {
+      color: #c0b28b;
+      font-size: 0.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+    }
+    .record-time {
+      font-family: monospace;
+      color: #d4c48a;
+    }
+    .empty-records {
+      text-align: center;
+      color: #8aa87a;
+      padding: 40px;
+    }
+    .clear-records-btn {
+      background: #a04444;
+      border: none;
+      border-bottom: 3px solid #6b2a2a;
+      color: #fcf9e7;
+      font-size: 0.85rem;
+      font-weight: bold;
+      padding: 8px 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      margin-top: 16px;
+      width: 100%;
+    }
+    .clear-records-btn:active {
+      transform: translateY(2px);
+    }
+
+    /* 编辑器规则弹窗 */
+    .editor-rules-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .editor-rules-content {
+      background: #2d4533;
+      border-radius: 40px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: 0 10px 0 #142010;
+    }
+    .editor-rules-content h2 {
+      color: #f3e9c0;
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .editor-rules-content h3 {
+      color: #d4c48a;
+      font-size: 1.2rem;
+      margin: 16px 0 8px;
+    }
+    .editor-rules-content p {
+      color: #c0b28b;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .editor-rules-content .code-block {
+      background: #1e3225;
+      padding: 10px;
+      border-radius: 16px;
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: #c0f0b0;
+      margin: 10px 0;
+      overflow-x: auto;
+    }
+    .goto-editor-btn {
+      background: #6b8f5e;
+      border: none;
+      border-bottom: 3px solid #3a5a2e;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 40px;
+      cursor: pointer;
+      margin-top: 16px;
+      width: 100%;
+    }
+    .goto-editor-btn:active {
+      transform: translateY(2px);
+    }
+
     /* 美化滚动条 */
     ::-webkit-scrollbar {
         width: 6px;
@@ -674,6 +826,9 @@
     <h1>· 点 灯 ·</h1>
     <div class="menu-buttons">
       <button class="btn" id="selectLevelBtn">📋 选择关卡</button>
+      <button class="btn" id="recordsBtn">📜 游玩记录</button>
+      <button class="btn" id="editorBtn">🔧 关卡工坊</button>
+      <button class="btn" id="communityBtn">🌐 关卡社区</button>
       <button class="btn" id="rulesBtn">📘 规则介绍</button>
     </div>
   </div>
@@ -712,6 +867,7 @@
     </div>
   </div>
 
+  <!-- 规则弹窗 -->
   <div class="rules-modal" id="rulesModal">
     <div class="rules-content">
       <h2>📘 明灯规则</h2>
@@ -733,6 +889,34 @@
     </div>
   </div>
 
+  <!-- 游玩记录弹窗 -->
+  <div class="records-modal" id="recordsModal">
+    <div class="records-content">
+      <h2>📜 游玩记录</h2>
+      <div id="recordsList" class="records-list"></div>
+      <button id="clearRecordsBtn" class="clear-records-btn">🗑️ 清空所有记录</button>
+      <button id="closeRecordsBtn" class="btn" style="margin-top:12px; font-size:0.9rem; padding:8px;">关闭</button>
+    </div>
+  </div>
+
+  <!-- 关卡工坊规则弹窗 -->
+  <div class="editor-rules-modal" id="editorRulesModal">
+    <div class="editor-rules-content">
+      <h2>🔧 关卡工坊 · 使用指南</h2>
+      <h3>🎨 设计区</h3>
+      <p>左侧为设计区，点击上方画笔选择要放置的元素：</p>
+      <p>• 🌿 空格：空白格子<br>• 🧱 障碍：阻挡光线<br>• 0~4：数字块，表示相邻四格需要放置的灯数<br>• ╱╲：镜面，反射光线<br>• ۞：散射，分裂光线</p>
+      <h3>🔍 测试区</h3>
+      <p>右侧为测试区，点击「同步地形」加载当前设计，然后点击空白格放置💡灯泡验证解谜逻辑。</p>
+      <h3>📦 导出JSON</h3>
+      <p>设计完成后点击「预览并导出」，复制生成的二维数组，然后到<strong>关卡社区</strong>上传分享！</p>
+      <div class="code-block">示例输出：[[0,0,0,...],[0,2,0,...],...]</div>
+      <button id="gotoEditorBtn" class="goto-editor-btn">🎮 进入关卡工坊</button>
+      <button id="closeEditorRulesBtn" class="btn" style="margin-top:12px; font-size:0.9rem; padding:8px;">暂不前往</button>
+    </div>
+  </div>
+
+  <!-- 胜利弹窗 -->
   <div class="victory-modal" id="victoryModal">
     <div class="victory-content">
       <h2>✨ 通关成功 ✨</h2>
@@ -756,6 +940,8 @@
     const victoryModal = document.getElementById('victoryModal');
     const victoryMessage = document.getElementById('victoryMessage');
     const rulesModal = document.getElementById('rulesModal');
+    const recordsModal = document.getElementById('recordsModal');
+    const editorRulesModal = document.getElementById('editorRulesModal');
     
     let currentLevel = 1;
     let currentCategory = 'regular';
@@ -782,6 +968,117 @@
     const currentLightsCountSpan = document.getElementById('currentLightsCount');
     const maxLightsLimitSpan = document.getElementById('maxLightsLimit');
     
+    // ---------- 游玩记录功能 ----------
+    const RECORDS_KEY = 'lightup_play_records';
+    const MAX_RECORDS = 100;
+    
+    function savePlayRecord(levelId, levelName, category, size, time, moves, completed) {
+      if (!completed) return;
+      
+      const records = getPlayRecords();
+      const newRecord = {
+        id: levelId,
+        name: levelName,
+        category: category,
+        size: size,
+        time: time,
+        moves: moves,
+        date: Date.now()
+      };
+      
+      // 检查是否已有该关卡记录，有则更新最佳成绩（时间更短则替换）
+      const existingIndex = records.findIndex(r => r.id === levelId);
+      if (existingIndex !== -1) {
+        if (time < records[existingIndex].time) {
+          records[existingIndex] = newRecord;
+        }
+      } else {
+        records.unshift(newRecord);
+      }
+      
+      // 限制最多100条
+      while (records.length > MAX_RECORDS) records.pop();
+      
+      localStorage.setItem(RECORDS_KEY, JSON.stringify(records));
+    }
+    
+    function getPlayRecords() {
+      const stored = localStorage.getItem(RECORDS_KEY);
+      return stored ? JSON.parse(stored) : [];
+    }
+    
+    function clearPlayRecords() {
+      localStorage.removeItem(RECORDS_KEY);
+      renderRecordsModal();
+    }
+    
+    function formatRecordTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      const cs = Math.floor((sec - Math.floor(sec)) * 100);
+      return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}.${cs.toString().padStart(2,'0')}`;
+    }
+    
+    function formatRecordDate(timestamp) {
+      const date = new Date(timestamp);
+      return `${date.getMonth()+1}/${date.getDate()} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
+    }
+    
+    function renderRecordsModal() {
+      const records = getPlayRecords();
+      const container = document.getElementById('recordsList');
+      
+      if (records.length === 0) {
+        container.innerHTML = '<div class="empty-records">✨ 暂无游玩记录\n完成关卡后会自动记录</div>';
+        return;
+      }
+      
+      let html = '';
+      for (let r of records) {
+        const categoryIcon = {
+          regular: '📖', mirror: '🪞', scatter: '✨', mixed: '🌀'
+        }[r.category] || '📦';
+        html += `
+          <div class="record-item">
+            <div class="record-name">${categoryIcon} ${escapeHtml(r.name)}</div>
+            <div class="record-info">
+              <span>📐 ${r.size}</span>
+              <span class="record-time">⏱️ ${formatRecordTime(r.time)}</span>
+              <span>🚶 ${r.moves}步</span>
+              <span>📅 ${formatRecordDate(r.date)}</span>
+            </div>
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+    }
+    
+    function openRecordsModal() {
+      renderRecordsModal();
+      recordsModal.style.display = 'flex';
+    }
+    
+    function closeRecordsModal() {
+      recordsModal.style.display = 'none';
+    }
+    
+    // ---------- 关卡工坊 ----------
+    function openEditorWithRules() {
+      editorRulesModal.style.display = 'flex';
+    }
+    
+    function closeEditorRulesModal() {
+      editorRulesModal.style.display = 'none';
+    }
+    
+    function gotoEditor() {
+      window.location.href = 'LightUpEditor.html';
+    }
+    
+    function gotoCommunity() {
+      window.location.href = 'LightUpCommunity.html';
+    }
+    
     // ---------- 辅助函数：检测盘面是否需要滚动并调整居中 ----------
     function updateBoardWrapperScrollMode() {
       if (!boardWrapper || !boardGridEl) return;
@@ -789,10 +1086,8 @@
       const gridWidth = boardGridEl.scrollWidth;
       
       if (gridWidth > wrapperWidth) {
-        // 超出容器，移除居中类，允许滚动
         boardWrapper.classList.remove('center-mode');
       } else {
-        // 未超出容器，添加居中类
         boardWrapper.classList.add('center-mode');
       }
     }
@@ -806,10 +1101,9 @@
     }
 
     function updateInfoDisplay() {
-      // 新格式：R-8-1，需要解析出序号
       const parts = currentLevel.split('-');
-      const num = parts[2];  // 关卡序号
-      levelNameDisplay.textContent = `关卡${num}`
+      const num = parts[2];
+      levelNameDisplay.textContent = `关卡${num}`;
       levelTimeDisplay.textContent = formatTime(elapsedSeconds);
       
       if (gameActive) {
@@ -1112,7 +1406,6 @@
         }
       }
       updateInfoDisplay();
-      // 渲染完成后更新滚动模式
       setTimeout(updateBoardWrapperScrollMode, 10);
     }
 
@@ -1168,6 +1461,19 @@
       
       markLevelCompleted(currentLevel);
       
+      // 保存游玩记录
+      const parts = currentLevel.split('-');
+      const prefix = parts[0];
+      const sizeNum = parts[1];
+      const levelNum = parts[2];
+      let categoryName = 'regular';
+      if (prefix === 'R') categoryName = 'regular';
+      else if (prefix === 'M') categoryName = 'mirror';
+      else if (prefix === 'S') categoryName = 'scatter';
+      else if (prefix === 'C') categoryName = 'mixed';
+      
+      savePlayRecord(currentLevel, `关卡${levelNum}`, categoryName, `${sizeNum}×${sizeNum}`, elapsedSeconds, currentMoves, true);
+      
       victoryMessage.textContent = `关卡${currentLevel}完成！\n用时 ${formatTime(elapsedSeconds)}  步数 ${currentMoves}`;
       victoryModal.style.display = 'flex';
       
@@ -1211,11 +1517,9 @@
       const category = LEVELS_CATEGORIES[categoryId];
       if (!category) return false;
 
-      // 新格式：R-8-1 或 M-10-2，需要解析出尺寸和关卡序号
-      // 格式为：分类前缀-尺寸-序号
       const parts = levelId.split('-');
-      const size = parts[1];  // 尺寸
-      const levelNum = parts[2];  // 关卡序号
+      const size = parts[1];
+      const levelNum = parts[2];
   
       const levelData = category.sizes[size]?.[levelNum];
       if (!levelData) return false;
@@ -1245,7 +1549,6 @@
         levelScreen.classList.remove('active');
         gameScreen.classList.add('active');
         currentScreen = 'game';
-        // 进入游戏后更新滚动模式
         setTimeout(updateBoardWrapperScrollMode, 50);
       }
     }
@@ -1284,7 +1587,6 @@
   
       const sizes = Object.keys(category.sizes).map(Number).sort((a, b) => a - b);
   
-      // 尺寸选择器
       let html = `<div class="size-selector">`;
       for (let size of sizes) {
         const activeClass = currentViewSize === size ? 'active' : '';
@@ -1292,7 +1594,6 @@
       }
       html += `</div>`;
   
-      // 关卡区域
       html += `<div class="levels-container">`;
       const sizeLevels = category.sizes[currentViewSize];
       if (sizeLevels && Object.keys(sizeLevels).length > 0) {
@@ -1319,7 +1620,6 @@
   
       levelContainer.innerHTML = html;
   
-      // 绑定尺寸按钮事件
       document.querySelectorAll('.size-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           currentViewSize = parseInt(e.currentTarget.dataset.size);
@@ -1327,7 +1627,6 @@
         });
       });
   
-      // 绑定关卡按钮事件
       document.querySelectorAll('.level-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const levelId = e.currentTarget.dataset.levelId;
@@ -1362,7 +1661,7 @@
     function nextLevel() {
       const category = LEVELS_CATEGORIES[currentCategory];
       const parts = currentLevel.split('-');
-      const prefix = parts[0];  // R, M, S, C
+      const prefix = parts[0];
       const currentSize = parts[1];
       const currentNum = parseInt(parts[2]);
       const nextNum = currentNum + 1;
@@ -1395,6 +1694,20 @@
         renderLevelGrid();
       });
       
+      document.getElementById('recordsBtn').addEventListener('click', openRecordsModal);
+      document.getElementById('closeRecordsBtn').addEventListener('click', closeRecordsModal);
+      document.getElementById('clearRecordsBtn').addEventListener('click', () => {
+        if (confirm('确定要清空所有游玩记录吗？')) {
+          clearPlayRecords();
+        }
+      });
+      
+      document.getElementById('editorBtn').addEventListener('click', openEditorWithRules);
+      document.getElementById('gotoEditorBtn').addEventListener('click', gotoEditor);
+      document.getElementById('closeEditorRulesBtn').addEventListener('click', closeEditorRulesModal);
+      
+      document.getElementById('communityBtn').addEventListener('click', gotoCommunity);
+      
       document.getElementById('rulesBtn').addEventListener('click', ()=>{
         rulesModal.style.display = 'flex';
       });
@@ -1407,6 +1720,14 @@
         if (e.target === rulesModal) {
           rulesModal.style.display = 'none';
         }
+      });
+      
+      recordsModal.addEventListener('click', (e) => {
+        if (e.target === recordsModal) closeRecordsModal();
+      });
+      
+      editorRulesModal.addEventListener('click', (e) => {
+        if (e.target === editorRulesModal) closeEditorRulesModal();
       });
       
       document.getElementById('backToMainBtn').addEventListener('click', ()=>{
@@ -1441,9 +1762,18 @@
         }
       });
       
-      // 监听窗口大小变化，重新检测滚动模式
       window.addEventListener('resize', () => {
         setTimeout(updateBoardWrapperScrollMode, 50);
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
       });
     }
 

@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>明灯谜境 · 关卡工坊 (双栏均衡版)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      background: linear-gradient(145deg, #1a2f1f 0%, #0e1a12 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+
+    /* 主容器 */
+    .editor-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      background: #2d4533;
+      border-radius: 48px;
+      box-shadow: 0 20px 30px rgba(0,0,0,0.7), inset 0 0 0 1px #6f9e7c;
+      padding: 20px 24px 28px;
+    }
+
+    h1 {
+      color: #f3e9c0;
+      text-shadow: 4px 4px 0 #1e3b28;
+      font-weight: 400;
+      letter-spacing: 4px;
+      font-size: 2.1rem;
+      margin: 0 0 6px 0;
+      text-align: center;
+    }
+
+    .sub {
+      text-align: center;
+      color: #c0b28b;
+      margin-bottom: 24px;
+      font-size: 0.85rem;
+    }
+
+    /* 双栏对半布局 (1:1) */
+    .editor-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .design-area, .test-area {
+      flex: 1;
+      min-width: 320px;
+      background: #1d2e21;
+      border-radius: 36px;
+      padding: 18px;
+      box-shadow: inset 0 2px 6px #0e140f, 0 6px 0 #0b130e;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .section-title {
+      color: #f3e9c0;
+      font-size: 1.3rem;
+      border-left: 6px solid #b8a45e;
+      padding-left: 12px;
+      margin-bottom: 14px;
+      font-weight: 500;
+    }
+
+    /* 工具栏 */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brush-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: #2a3a2e;
+      padding: 8px 14px;
+      border-radius: 60px;
+    }
+
+    .brush-btn {
+      background: #4c6b53;
+      border: none;
+      border-bottom: 3px solid #1e2f22;
+      color: #fcf9e7;
+      font-size: 1.1rem;
+      font-weight: bold;
+      padding: 6px 14px;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: 0.05s linear;
+      box-shadow: 0 2px 0 #142010;
+      min-width: 56px;
+    }
+
+    .brush-btn.active {
+      background: #e6c97e;
+      border-bottom-color: #b88b3a;
+      color: #2a3a1a;
+      transform: translateY(1px);
+      box-shadow: 0 1px 0 #142010;
+    }
+
+    .brush-btn:active {
+      transform: translateY(2px);
+      border-bottom-width: 1px;
+    }
+
+    .size-control {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: #2a3a2e;
+      padding: 5px 18px;
+      border-radius: 40px;
+    }
+
+    .size-control label {
+      color: #f3eac2;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .size-input {
+      width: 55px;
+      background: #4c6b53;
+      border: none;
+      color: #fff;
+      font-weight: bold;
+      padding: 6px;
+      border-radius: 20px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 10px;
+    }
+
+    .icon-btn-sm {
+      background: #496e52;
+      border: none;
+      border-bottom: 3px solid #1d3622;
+      color: #f7f0d9;
+      font-size: 0.9rem;
+      padding: 6px 14px;
+      border-radius: 32px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.05s;
+    }
+
+    .icon-btn-sm:active {
+      transform: translateY(2px);
+    }
+
+    /* 关键修改：智能滚动与居中 */
+    .board-wrapper {
+      display: flex;
+      overflow-x: auto;
+      padding: 8px 0;
+      scrollbar-width: thin;
+    }
+
+    /* 当内容不超出时居中，超出时左对齐滚动 */
+    .board-wrapper {
+      justify-content: center;
+    }
+    
+    /* 当有横向滚动时，改为左对齐（通过JS动态检测并调整） */
+    .board-wrapper.scroll-mode {
+      justify-content: flex-start;
+    }
+
+    .board-grid {
+      display: grid;
+      background: #1e3225;
+      padding: 8px;
+      border-radius: 20px;
+      box-shadow: inset 0 0 0 2px #56855e, 0 6px 0 #0c1a0f;
+      gap: 2px;
+      width: max-content;
+      min-width: min-content;
+    }
+
+    .cell {
+      width: 46px;
+      height: 46px;
+      background: #dcedc4;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.3rem;
+      box-shadow: inset 0 -3px 0 #7a9e7e, 0 1px 0 #0f1f12;
+      cursor: pointer;
+      transition: 0.04s;
+      color: #1e3f26;
+    }
+
+    .cell.obstacle { background: #3b2f1f; color: #ebdbbd; }
+    .cell.number { background: #5d6e4a; color: #fbf3d5; font-size: 1.4rem; }
+    .cell.mirror { background: #7a9eb3; color: #1a2f3a; font-size: 1.6rem; }
+    .cell.scatter { background: #b8a45e; color: #3a2e0e; font-size: 1.5rem; }
+    .cell.light { background: #f5e98b; box-shadow: inset 0 -3px 0 #bcb05e; }
+    .cell.light.invalid-light { background: #a04444; box-shadow: inset 0 -3px 0 #6b2a2a; color: #ffd7d7; }
+
+    /* 测试区域特有样式 */
+    .test-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .json-preview {
+      background: #2a3a2e;
+      border-radius: 24px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 0.7rem;
+      color: #c0f0b0;
+      max-height: 220px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin-top: 12px;
+    }
+
+    .victory-sim {
+      background: #2a3a2e;
+      padding: 12px;
+      border-radius: 28px;
+      text-align: center;
+      margin-top: 16px;
+      color: #f3eac2;
+    }
+
+    .status-msg {
+      color: #f3eac2;
+      font-size: 0.85rem;
+      margin: 8px 0;
+    }
+
+    hr {
+      border-color: #4a6e52;
+      margin: 12px 0;
+    }
+
+    footer {
+      margin-top: 24px;
+      text-align: center;
+      color: #8aa87a;
+      font-size: 0.75rem;
+    }
+
+    /* 美化滚动条 */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #1d2e21;
+        border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #6b8f5e;
+        border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #8bb07a;
+    }
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: #6b8f5e #1d2e21;
+    }
+
+    /* ========== 移动端响应式适配 ========== */
+    
+    /* 手机横屏/小屏设备 */
+    @media (max-width: 860px) {
+      .cell { width: 36px; height: 36px; font-size: 1rem; }
+      .cell.number { font-size: 1.1rem; }
+      .cell.mirror { font-size: 1.3rem; }
+      .cell.scatter { font-size: 1.2rem; }
+      .brush-btn { padding: 4px 10px; font-size: 0.85rem; min-width: 44px; }
+      .section-title { font-size: 1.1rem; }
+      h1 { font-size: 1.8rem; letter-spacing: 3px; }
+      .editor-container { padding: 12px 14px 18px; }
+      body { padding: 12px; }
+    }
+    
+    /* 手机竖屏/小屏设备 - 关键修复：确保容器不溢出 */
+    @media (max-width: 700px) {
+      .editor-layout { 
+        flex-direction: column; 
+        gap: 14px;
+      }
+      .design-area, .test-area { 
+        flex: auto; 
+        min-width: 0; /* 确保flex子项不溢出 */
+        width: 100%;
+        padding: 12px;
+      }
+      .toolbar { 
+        flex-direction: column; 
+        align-items: stretch;
+      }
+      .brush-panel { 
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .size-control { 
+        justify-content: center;
+      }
+      .action-btns { 
+        justify-content: center;
+      }
+      .cell { width: 34px; height: 34px; font-size: 0.9rem; }
+      .cell.number { font-size: 1rem; }
+      .cell.mirror { font-size: 1.2rem; }
+      .cell.scatter { font-size: 1.1rem; }
+    }
+    
+    /* 超小屏设备 */
+    @media (max-width: 480px) {
+      .editor-container { 
+        padding: 10px 12px 16px; 
+        border-radius: 32px;
+      }
+      .design-area, .test-area { 
+        padding: 10px; 
+        border-radius: 24px;
+      }
+      .cell { width: 30px; height: 30px; font-size: 0.8rem; }
+      .cell.number { font-size: 0.9rem; }
+      .cell.mirror { font-size: 1rem; }
+      .cell.scatter { font-size: 0.9rem; }
+      .brush-btn { padding: 3px 8px; font-size: 0.70rem; min-width: 38px; }
+      .icon-btn-sm { padding: 4px 10px; font-size: 0.75rem; }
+      .size-input { width: 40px; font-size: 0.75rem; }
+      .section-title { font-size: 1rem; }
+      h1 { font-size: 1.5rem; letter-spacing: 2px; }
+      .sub { font-size: 0.7rem; margin-bottom: 16px; }
+      .json-preview { font-size: 0.55rem; max-height: 160px; }
+      .victory-sim { padding: 8px; margin-top: 10px; }
+      .victory-sim div { font-size: 0.65rem; }
+      .status-msg { font-size: 0.7rem; }
+      footer { font-size: 0.6rem; }
+    }
+    
+    /* 触摸优化：增大可点击区域 */
+    @media (hover: none) and (pointer: coarse) {
+      .brush-btn, .icon-btn-sm, .size-btn, .cell {
+        touch-action: manipulation;
+      }
+      .board-wrapper {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="editor-container">
+  <h1>🏮 明灯谜境 · 关卡工坊 🏮</h1>
+  <div class="sub">设计区 ⇄ 测试区 (1:1) | 点击格子放置/取消当前元素 | 支持镜面/散射/数字</div>
+
+  <div class="editor-layout">
+    <!-- 左侧设计区 -->
+    <div class="design-area">
+      <div class="section-title">🎨 关卡设计</div>
+      <div class="toolbar">
+        <div class="brush-panel">
+          <button data-brush="empty" class="brush-btn active">🌿 空格</button>
+          <button data-brush="obstacle" class="brush-btn">🧱 障碍</button>
+          <button data-brush="number0" class="brush-btn">0</button>
+          <button data-brush="number1" class="brush-btn">1</button>
+          <button data-brush="number2" class="brush-btn">2</button>
+          <button data-brush="number3" class="brush-btn">3</button>
+          <button data-brush="number4" class="brush-btn">4</button>
+          <button data-brush="mirror1" class="brush-btn">╱</button>
+          <button data-brush="mirror2" class="brush-btn">╲</button>
+          <button data-brush="scatter" class="brush-btn">۞</button>
+        </div>
+        <div class="size-control">
+          <label>📐 宽</label>
+          <input type="number" id="gridWidth" class="size-input" min="8" max="20" value="10">
+          <label>高</label>
+          <input type="number" id="gridHeight" class="size-input" min="8" max="20" value="10">
+          <button id="resizeGridBtn" class="icon-btn-sm">重置尺寸</button>
+        </div>
+        <div class="action-btns">
+          <button id="clearAllBtn" class="icon-btn-sm">🗑️ 清空</button>
+          <button id="fillEmptyBtn" class="icon-btn-sm">🌱 全空格</button>
+        </div>
+      </div>
+      <div class="board-wrapper" id="designBoardWrapper">
+        <div class="board-grid" id="editorGrid"></div>
+      </div>
+      <div class="status-msg" style="margin-top: 10px; text-align: center; font-size: 0.8rem;">
+        ✨ 点击格子放置当前画笔元素；再次点击相同类型可取消（变回空格）
+      </div>
+    </div>
+
+    <!-- 右侧测试与导出区 -->
+    <div class="test-area">
+      <div class="section-title">🔍 模拟测试 & 导出</div>
+      <div class="test-buttons">
+        <button id="runTestBtn" class="icon-btn-sm">🔄 同步地形</button>
+        <button id="resetLightsBtn" class="icon-btn-sm">💡 重置灯泡</button>
+        <button id="autoSolveHint" class="icon-btn-sm">✨ 智能补光</button>
+      </div>
+      <div id="testStatus" class="status-msg">⚡ 未测试，点击「同步地形」加载当前设计</div>
+      <div class="board-wrapper" id="testBoardWrapper">
+        <div class="board-grid" id="testGrid"></div>
+      </div>
+      <div class="victory-sim">
+        <div id="victoryCheckMsg" style="font-weight: bold;">🔮 胜利自检: 待同步</div>
+        <div style="font-size:0.7rem; margin-top:6px;">💡 提示: 在测试区点击空白格可放置/取消灯泡，验证解谜逻辑</div>
+        <div style="font-size:0.7rem; margin-top:4px; color:#a04444;">⚠️ 红色灯泡表示被其他灯光照射，违反规则</div>
+        <div style="font-size:0.7rem; margin-top:4px; color:#f5e98b;">✅ 只有通过测试（绿灯状态）才能导出关卡</div>
+      </div>
+      <hr>
+      <div class="section-title" style="margin-bottom: 8px;">📦 导出 JSON (编码格式)</div>
+      <div style="display: flex; gap: 12px; margin-bottom: 8px;">
+        <button id="exportJsonBtn" class="icon-btn-sm" style="background: #6b8f5e;">⬇️ 验证并导出编码</button>
+        <button id="copyJsonBtn" class="icon-btn-sm" style="background: #5a6e4a;">📋 复制编码</button>
+      </div>
+      <div class="json-preview" id="jsonPreview">点击导出将生成编码，只有通关的关卡才能导出。</div>
+    </div>
+  </div>
+  <footer>
+    💡 设计规则：0=空格 1=障碍 2~6=数字(0~4) 7=╱ 8=╲ 9=散射。<br>
+    右侧测试区完全模拟游戏光照、镜面反射、散射和数字约束，可自由放置灯泡验证可行性。<br>
+    <strong>⚠️ 只有满足胜利条件（所有空格被照亮、数字约束满足、无灯被照射）的关卡才能导出！</strong>
+  </footer>
+</div>
+
+<script>
+  (function(){
+    // ---------- 编辑器核心 ----------
+    let currentBrush = 'empty';
+    let gridData = [];
+    let width = 6, height = 6;
+    
+    // 测试模式数据
+    let testLights = [];
+    let testIlluminated = [];
+    let invalidLights = new Set(); // 存储违反规则的灯的位置 "r,c"
+    let isSolvable = false;        // 当前测试区是否满足通关条件
+    
+    // DOM 元素
+    const editorGridDiv = document.getElementById('editorGrid');
+    const testGridDiv = document.getElementById('testGrid');
+    const widthInput = document.getElementById('gridWidth');
+    const heightInput = document.getElementById('gridHeight');
+    const resizeBtn = document.getElementById('resizeGridBtn');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+    const fillEmptyBtn = document.getElementById('fillEmptyBtn');
+    const runTestBtn = document.getElementById('runTestBtn');
+    const resetLightsBtn = document.getElementById('resetLightsBtn');
+    const autoSolveHint = document.getElementById('autoSolveHint');
+    const exportJsonBtn = document.getElementById('exportJsonBtn');
+    const copyJsonBtn = document.getElementById('copyJsonBtn');
+    const testStatusDiv = document.getElementById('testStatus');
+    const victoryCheckMsg = document.getElementById('victoryCheckMsg');
+    
+    const designBoardWrapper = document.getElementById('designBoardWrapper');
+    const testBoardWrapper = document.getElementById('testBoardWrapper');
+    
+    // ---------- 辅助函数: 智能滚动/居中检测 ----------
+    function updateScrollMode(wrapperElement) {
+      if (!wrapperElement) return;
+      const gridElement = wrapperElement.querySelector('.board-grid');
+      if (!gridElement) return;
+      const wrapperWidth = wrapperElement.clientWidth;
+      const gridWidth = gridElement.scrollWidth;
+      if (gridWidth > wrapperWidth) {
+        wrapperElement.classList.add('scroll-mode');
+      } else {
+        wrapperElement.classList.remove('scroll-mode');
+      }
+    }
+    
+    function observeResize() {
+      if (window.ResizeObserver) {
+        const resizeObserver = new ResizeObserver(() => {
+          updateScrollMode(designBoardWrapper);
+          updateScrollMode(testBoardWrapper);
+        });
+        if (designBoardWrapper) resizeObserver.observe(designBoardWrapper);
+        if (testBoardWrapper) resizeObserver.observe(testBoardWrapper);
+        if (editorGridDiv) resizeObserver.observe(editorGridDiv);
+        if (testGridDiv) resizeObserver.observe(testGridDiv);
+      }
+      window.addEventListener('resize', () => {
+        updateScrollMode(designBoardWrapper);
+        updateScrollMode(testBoardWrapper);
+      });
+    }
+    
+    // ---------- 辅助函数: 类型转换 ----------
+    function cellToExportCode(cellObj) {
+      if (!cellObj) return 0;
+      if (cellObj.type === 'empty') return 0;
+      if (cellObj.type === 'obstacle') return 1;
+      if (cellObj.type === 'number') return 2 + cellObj.value;
+      if (cellObj.type === 'mirror1') return 7;
+      if (cellObj.type === 'mirror2') return 8;
+      if (cellObj.type === 'scatter') return 9;
+      return 0;
+    }
+    
+    function exportToLevelArray() {
+      const rows = height;
+      const cols = width;
+      const result = [];
+      for (let i = 0; i < rows; i++) {
+        const rowArr = [];
+        for (let j = 0; j < cols; j++) {
+          rowArr.push(cellToExportCode(gridData[i]?.[j]));
+        }
+        result.push(rowArr);
+      }
+      return result;
+    }
+    
+    // 获取当前测试区使用的灯数（用于maxLights限制）
+    function getCurrentLightsCount() {
+      let cnt = 0;
+      for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+          if (testLights[i]?.[j]) cnt++;
+        }
+      }
+      return cnt;
+    }
+    
+    // 导出编码（将盘面数据和灯数限制编码为Base64）
+    function encodeLevelData(levelArray, maxLights) {
+      const data = {
+        v: 1,                    // 版本
+        w: width,
+        h: height,
+        g: levelArray,
+        m: maxLights
+      };
+      const jsonStr = JSON.stringify(data);
+      // 使用Base64编码，同时支持Unicode
+      const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+      return encoded;
+    }
+    
+    // 解码导入（供社区使用）
+    function decodeLevelData(encodedStr) {
+      try {
+        const jsonStr = decodeURIComponent(escape(atob(encodedStr)));
+        const data = JSON.parse(jsonStr);
+        if (data.v === 1 && data.g && data.w && data.h) {
+          return data;
+        }
+        return null;
+      } catch(e) {
+        return null;
+      }
+    }
+    
+    // 检查测试区是否满足胜利条件
+    function checkTestVictory() {
+      // 所有空格被照亮
+      let allEmptyLit = true;
+      for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+          const cell = gridData[i]?.[j];
+          if (cell && cell.type === 'empty' && !testIlluminated[i][j]) {
+            allEmptyLit = false;
+            break;
+          }
+        }
+      }
+      // 数字约束满足
+      const invalidNums = getInvalidNumbersTest(testLights, height, width);
+      // 无违规灯泡
+      const hasInvalidLights = invalidLights.size > 0;
+      
+      return allEmptyLit && invalidNums.length === 0 && !hasInvalidLights;
+    }
+    
+    function updateSolvableStatus() {
+      isSolvable = checkTestVictory();
+      if (isSolvable) {
+        victoryCheckMsg.innerHTML = '🎉 当前测试配置可通关！可以导出关卡 🎉';
+        testStatusDiv.innerHTML = '✅ 胜利条件达成！所有空格被照亮，数字约束满足，且无灯被照射！';
+      } else {
+        victoryCheckMsg.innerHTML = '🔧 未满足全部条件，请放置灯泡测试，通关后方可导出';
+      }
+    }
+    
+    // ---------- 辅助函数: 类型转换 ----------
+    function getCellObjFromBrush(brush) {
+      if (brush === 'empty') return { type: 'empty' };
+      if (brush === 'obstacle') return { type: 'obstacle' };
+      if (brush === 'mirror1') return { type: 'mirror1' };
+      if (brush === 'mirror2') return { type: 'mirror2' };
+      if (brush === 'scatter') return { type: 'scatter' };
+      if (brush === 'number0') return { type: 'number', value: 0 };
+      if (brush === 'number1') return { type: 'number', value: 1 };
+      if (brush === 'number2') return { type: 'number', value: 2 };
+      if (brush === 'number3') return { type: 'number', value: 3 };
+      if (brush === 'number4') return { type: 'number', value: 4 };
+      return { type: 'empty' };
+    }
+    
+    function isSameCell(a, b) {
+      if (!a || !b) return false;
+      if (a.type !== b.type) return false;
+      if (a.type === 'number' && a.value !== b.value) return false;
+      return true;
+    }
+    
+    function onDesignCellClick(row, col) {
+      const targetObj = getCellObjFromBrush(currentBrush);
+      const currentCell = gridData[row][col];
+      if (currentCell && isSameCell(currentCell, targetObj)) {
+        gridData[row][col] = { type: 'empty' };
+      } else {
+        gridData[row][col] = targetObj;
+      }
+      renderEditor();
+      syncTestFromEditor(false);
+      fullRefreshTestAfterDesign();
+    }
+    
+    function fullRefreshTestAfterDesign() {
+      const newLights = Array(height).fill().map(() => Array(width).fill(false));
+      for (let i = 0; i < Math.min(testLights?.length || 0, height); i++) {
+        for (let j = 0; j < Math.min(testLights[i]?.length || 0, width); j++) {
+          if (testLights[i] && testLights[i][j] === true) {
+            newLights[i][j] = true;
+          }
+        }
+      }
+      testLights = newLights;
+      testIlluminated = computeIlluminationTest(testLights, height, width);
+      computeInvalidLights();
+      renderTestBoard();
+      updateTestStatus();
+    }
+    
+    function initGrid(h, w, fillType = 'empty') {
+      const newGrid = [];
+      for (let i = 0; i < h; i++) {
+        newGrid[i] = [];
+        for (let j = 0; j < w; j++) {
+          newGrid[i][j] = { type: fillType };
+        }
+      }
+      return newGrid;
+    }
+    
+    function resizeGrid() {
+      let newW = parseInt(widthInput.value);
+      let newH = parseInt(heightInput.value);
+      if (isNaN(newW)) newW = 10;
+      if (isNaN(newH)) newH = 10;
+      newW = Math.min(20, Math.max(8, newW));
+      newH = Math.min(20, Math.max(8, newH));
+      widthInput.value = newW;
+      heightInput.value = newH;
+      
+      const oldGrid = gridData;
+      const newGrid = initGrid(newH, newW, 'empty');
+      for (let i = 0; i < Math.min(height, newH); i++) {
+        for (let j = 0; j < Math.min(width, newW); j++) {
+          if (oldGrid[i] && oldGrid[i][j]) newGrid[i][j] = { ...oldGrid[i][j] };
+        }
+      }
+      width = newW;
+      height = newH;
+      gridData = newGrid;
+      renderEditor();
+      testLights = Array(height).fill().map(() => Array(width).fill(false));
+      testIlluminated = computeIlluminationTest(testLights, height, width);
+      computeInvalidLights();
+      renderTestBoard();
+      updateTestStatus();
+      
+      setTimeout(() => {
+        updateScrollMode(designBoardWrapper);
+        updateScrollMode(testBoardWrapper);
+      }, 10);
+    }
+    
+    function clearAll() {
+      for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+          gridData[i][j] = { type: 'empty' };
+        }
+      }
+      renderEditor();
+      fullRefreshTestAfterDesign();
+      setTimeout(() => {
+        updateScrollMode(designBoardWrapper);
+        updateScrollMode(testBoardWrapper);
+      }, 10);
+    }
+    
+    function fillAllEmpty() {
+      for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+          gridData[i][j] = { type: 'empty' };
+        }
+      }
+      renderEditor();
+      fullRefreshTestAfterDesign();
+      setTimeout(() => {
+        updateScrollMode(designBoardWrapper);
+        updateScrollMode(testBoardWrapper);
+      }, 10);
+    }
+    
+    function setBrush(brushId) {
+      currentBrush = brushId;
+      document.querySelectorAll('.brush-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.querySelector(`.brush-btn[data-brush="${brushId}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+    
+    function renderEditor() {
+      editorGridDiv.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
+      editorGridDiv.innerHTML = '';
+      for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+          const cell = gridData[i][j];
+          const div = document.createElement('div');
+          div.classList.add('cell');
+          let content = '';
+          if (cell.type === 'obstacle') { content = '🧱'; div.classList.add('obstacle'); }
+          else if (cell.type === 'number') { content = cell.value.toString(); div.classList.add('number'); }
+          else if (cell.type === 'mirror1') { content = '╱'; div.classList.add('mirror'); }
+          else if (cell.type === 'mirror2') { content = '╲'; div.classList.add('mirror'); }
+          else if (cell.type === 'scatter') { content = '۞'; div.classList.add('scatter'); }
+          else { content = ''; }
+          div.textContent = content;
+          div.addEventListener('click', (function(r,c){ return ()=>onDesignCellClick(r,c); })(i,j));
+          editorGridDiv.appendChild(div);
+        }
+      }
+      setTimeout(() => updateScrollMode(designBoardWrapper), 10);
+    }
+    
+    // ---------- 光照引擎 ----------
+    const DIRS = {
+      'up': [-1, 0], 'down': [1, 0], 'left': [0, -1], 'right': [0, 1],
+      'up-left': [-1, -1], 'up-right': [-1, 1], 'down-left': [1, -1], 'down-right': [1, 1]
+    };
+    const MIRROR_REFLECT = {
+      '╱': { 'up': 'right', 'down': 'left', 'left': 'down', 'right': 'up',
+        'up-left': 'down-right', 'up-right': 'up-right', 'down-left': 'down-left', 'down-right': 'up-left' },
+      '╲': { 'up': 'left', 'down': 'right', 'left': 'up', 'right': 'down',
+        'up-left': 'up-left', 'up-right': 'down-left', 'down-left': 'up-right', 'down-right': 'down-right' }
+    };
+    const SCATTER_SPLIT = {
+      'up': ['up-left', 'up-right'], 'down': ['down-left', 'down-right'],
+      'left': ['up-left', 'down-left'], 'right': ['up-right', 'down-right'],
+      'up-left': ['up', 'left'], 'up-right': ['up', 'right'],
+      'down-left': ['down', 'left'], 'down-right': ['down', 'right']
+    };
+    
+    function getCellTypeForTest(row, col) {
+      if (row<0 || row>=height || col<0 || col>=width) return 'empty';
+      const cell = gridData[row][col];
+      if (!cell) return 'empty';
+      if (cell.type === 'obstacle') return 'obstacle';
+      if (cell.type === 'number') return `number:${cell.value}`;
+      if (cell.type === 'mirror1') return 'mirror1';
+      if (cell.type === 'mirror2') return 'mirror2';
+      if (cell.type === 'scatter') return 'scatter';
+      return 'empty';
+    }
+    
+    function computeIlluminationTest(lightsMat, h, w) {
+      const ill = Array(h).fill().map(() => Array(w).fill(false));
+      const visited = new Set();
+      const queue = [];
+      for (let r=0; r<h; r++){
+        for(let c=0; c<w; c++){
+          if(lightsMat[r][c]){
+            ill[r][c]=true;
+            for(let dir of ['up','down','left','right']){
+              queue.push({r,c,dir});
+            }
+          }
+        }
+      }
+      while(queue.length){
+        const {r,c,dir} = queue.shift();
+        const key = `${r},${c},${dir}`;
+        if(visited.has(key)) continue;
+        visited.add(key);
+        const [dr,dc] = DIRS[dir];
+        let nr = r+dr, nc = c+dc;
+        if(nr<0 || nr>=h || nc<0 || nc>=w) continue;
+        const cellType = getCellTypeForTest(nr,nc);
+        ill[nr][nc] = true;
+        if(cellType === 'obstacle' || cellType.startsWith('number')) continue;
+        if(cellType === 'mirror1' || cellType === 'mirror2'){
+          const mirrorChar = cellType === 'mirror1' ? '╱' : '╲';
+          if(MIRROR_REFLECT[mirrorChar][dir]){
+            queue.push({r:nr,c:nc, dir: MIRROR_REFLECT[mirrorChar][dir]});
+          }
+          continue;
+        }
+        if(cellType === 'scatter'){
+          if(SCATTER_SPLIT[dir]){
+            for(let nd of SCATTER_SPLIT[dir]) queue.push({r:nr,c:nc, dir: nd});
+          }
+          continue;
+        }
+        queue.push({r:nr,c:nc, dir});
+      }
+      return ill;
+    }
+    
+    function computeInvalidLights() {
+      invalidLights.clear();
+      for (let r = 0; r < height; r++) {
+        for (let c = 0; c < width; c++) {
+          if (testLights[r][c]) {
+            const lightsWithoutCurrent = testLights.map(row => [...row]);
+            lightsWithoutCurrent[r][c] = false;
+            const illWithoutCurrent = computeIlluminationTest(lightsWithoutCurrent, height, width);
+            if (illWithoutCurrent[r][c]) {
+              invalidLights.add(`${r},${c}`);
+            }
+          }
+        }
+      }
+    }
+    
+    function getInvalidNumbersTest(lightsMat, h, w) {
+      const invalid = [];
+      for(let i=0;i<h;i++){
+        for(let j=0;j<w;j++){
+          const cell = gridData[i]?.[j];
+          if(cell && cell.type === 'number'){
+            const target = cell.value;
+            let cnt = 0;
+            [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{
+              const ni=i+dx, nj=j+dy;
+              if(ni>=0 && ni<h && nj>=0 && nj<w && lightsMat[ni][nj]) cnt++;
+            });
+            if(cnt !== target) invalid.push([i,j]);
+          }
+        }
+      }
+      return invalid;
+    }
+    
+    function syncTestFromEditor(resetLights = true) {
+      if (resetLights) {
+        testLights = Array(height).fill().map(() => Array(width).fill(false));
+      } else {
+        const newLights = Array(height).fill().map(() => Array(width).fill(false));
+        for (let i=0; i<Math.min(testLights?.length||0, height); i++) {
+          for (let j=0; j<Math.min(testLights[i]?.length||0, width); j++) {
+            if (testLights[i]?.[j]) newLights[i][j] = true;
+          }
+        }
+        testLights = newLights;
+      }
+      testIlluminated = computeIlluminationTest(testLights, height, width);
+      computeInvalidLights();
+      renderTestBoard();
+      updateTestStatus();
+    }
+    
+    function renderTestBoard() {
+      testGridDiv.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
+      testGridDiv.innerHTML = '';
+      const ill = testIlluminated;
+      for(let i=0;i<height;i++){
+        for(let j=0;j<width;j++){
+          const cell = gridData[i]?.[j];
+          const hasLight = testLights[i][j];
+          const isLit = ill[i][j];
+          const isInvalidLight = hasLight && invalidLights.has(`${i},${j}`);
+          const div = document.createElement('div');
+          div.classList.add('cell');
+          div.style.cursor = 'pointer';
+          let content = '';
+
+          if(cell?.type === 'obstacle'){ 
+            content='🧱'; 
+            div.classList.add('obstacle');
+          }
+          else if(cell?.type === 'number'){ 
+            content=cell.value.toString(); 
+            div.classList.add('number');
+          }
+          else if(cell?.type === 'mirror1'){ 
+            content='╱'; 
+            div.classList.add('mirror');
+            if(isLit) div.style.background = '#a8d4c4';
+          }
+          else if(cell?.type === 'mirror2'){ 
+            content='╲'; 
+            div.classList.add('mirror');
+            if(isLit) div.style.background = '#a8d4c4';
+          }
+          else if(cell?.type === 'scatter'){ 
+            content='۞'; 
+            div.classList.add('scatter');
+            if(isLit) div.style.background = '#d4c48a';
+          }
+          else {
+            if(hasLight){ 
+              content='💡'; 
+              div.classList.add('light');
+              if(isInvalidLight) {
+                div.classList.add('invalid-light');
+                div.style.background = '#a04444';
+              } else {
+                div.style.background = '#f5e98b';
+              }
+            } else { 
+              content=''; 
+              if(isLit) div.style.background = '#f5e98b'; 
+              else div.style.background = '#dcedc4';
+            }
+          }
+
+          div.textContent = content;
+          div.addEventListener('click', (function(r,c){ return ()=>{
+            const cellType = gridData[r]?.[c];
+            if(cellType && cellType.type === 'empty'){
+              testLights[r][c] = !testLights[r][c];
+              testIlluminated = computeIlluminationTest(testLights, height, width);
+              computeInvalidLights();
+              renderTestBoard();
+              updateTestStatus();
+            }
+          }; })(i,j));
+          testGridDiv.appendChild(div);
+        }
+      }
+      setTimeout(() => updateScrollMode(testBoardWrapper), 10);
+    }
+    
+    function updateTestStatus() {
+      const invalidNums = getInvalidNumbersTest(testLights, height, width);
+      let allEmptyLit = true;
+      for(let i=0;i<height;i++){
+        for(let j=0;j<width;j++){
+          const cell = gridData[i]?.[j];
+          if(cell && cell.type === 'empty' && !testIlluminated[i][j]) allEmptyLit = false;
+        }
+      }
+      const hasInvalidLights = invalidLights.size > 0;
+      const win = allEmptyLit && invalidNums.length === 0 && !hasInvalidLights;
+      
+      if(win){
+        testStatusDiv.innerHTML = '✅ 胜利条件达成！所有空格被照亮，数字约束满足，且无灯被照射！';
+        victoryCheckMsg.innerHTML = '🎉 当前测试配置可通关 🎉';
+      } else {
+        let msg = '';
+        if(!allEmptyLit) msg += `⚠️ 尚有 ${countUnlitEmpty()} 个空格未照亮。 `;
+        if(invalidNums.length>0) msg += `❌ 有 ${invalidNums.length} 个数字不匹配。 `;
+        if(hasInvalidLights) msg += `🔴 有 ${invalidLights.size} 盏灯被其他灯光照射。`;
+        testStatusDiv.innerHTML = msg || '⚡ 未胜利，继续放置灯泡';
+        victoryCheckMsg.innerHTML = '🔧 未满足全部条件，请放置灯泡测试，通关后方可导出';
+      }
+      updateSolvableStatus();
+    }
+    
+    function countUnlitEmpty(){
+      let cnt=0;
+      for(let i=0;i<height;i++){
+        for(let j=0;j<width;j++){
+          const cell = gridData[i]?.[j];
+          if(cell && cell.type === 'empty' && !testIlluminated[i][j]) cnt++;
+        }
+      }
+      return cnt;
+    }
+    
+    function resetTestLights(){
+      testLights = Array(height).fill().map(()=>Array(width).fill(false));
+      testIlluminated = computeIlluminationTest(testLights, height, width);
+      computeInvalidLights();
+      renderTestBoard();
+      updateTestStatus();
+    }
+    
+    function autoFillUnlit(){
+      for(let i=0;i<height;i++){
+        for(let j=0;j<width;j++){
+          const cell = gridData[i]?.[j];
+          if(cell && cell.type === 'empty' && !testIlluminated[i][j]){
+            testLights[i][j] = true;
+          }
+        }
+      }
+      testIlluminated = computeIlluminationTest(testLights, height, width);
+      computeInvalidLights();
+      renderTestBoard();
+      updateTestStatus();
+    }
+    
+    function showEncodedPreview(){
+      const levelArray = exportToLevelArray();
+      const lightCount = getCurrentLightsCount();
+      
+      // 验证是否可通关
+      if (!isSolvable) {
+        alert('❌ 关卡尚未通关！请在右侧测试区放置灯泡，确保所有空格被照亮、数字约束满足、无灯被照射后再导出。');
+        return null;
+      }
+      
+      // 使用当前测试区使用的灯数作为maxLights限制
+      const encoded = encodeLevelData(levelArray, lightCount);
+      document.getElementById('jsonPreview').innerHTML = `// 关卡编码 (通关灯数: ${lightCount})\n${encoded}\n\n// 解码后信息：\n宽度: ${width}, 高度: ${height}\n推荐灯数限制: ${lightCount}`;
+      return encoded;
+    }
+    
+    function copyEncodedToClipboard(){
+      const encoded = showEncodedPreview();
+      if (encoded) {
+        navigator.clipboard.writeText(encoded).then(()=>{
+          alert('关卡编码已复制！可以在关卡广场上传使用。');
+        }).catch(()=> alert('复制失败'));
+      }
+    }
+    
+    function bindEvents(){
+      document.querySelectorAll('.brush-btn').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          const brush = e.currentTarget.getAttribute('data-brush');
+          if(brush) setBrush(brush);
+        });
+      });
+      resizeBtn.addEventListener('click', resizeGrid);
+      clearAllBtn.addEventListener('click', clearAll);
+      fillEmptyBtn.addEventListener('click', fillAllEmpty);
+      runTestBtn.addEventListener('click', ()=>{
+        syncTestFromEditor(true);
+        testStatusDiv.innerHTML = '✨ 已同步地形，灯泡已重置，可点击测试格放置灯泡';
+        setTimeout(() => updateScrollMode(testBoardWrapper), 10);
+      });
+      resetLightsBtn.addEventListener('click', resetTestLights);
+      autoSolveHint.addEventListener('click', autoFillUnlit);
+      exportJsonBtn.addEventListener('click', ()=>{
+        showEncodedPreview();
+        if (isSolvable) alert('✅ 关卡已验证通关，编码已生成！');
+      });
+      copyJsonBtn.addEventListener('click', copyEncodedToClipboard);
+    }
+    
+    function init(){
+      width=10; height=10;
+      widthInput.value=10; heightInput.value=10;
+      gridData = initGrid(10,10,'empty');
+      testLights = Array(10).fill().map(()=>Array(10).fill(false));
+      testIlluminated = computeIlluminationTest(testLights, 10, 10);
+      computeInvalidLights();
+      renderEditor();
+      renderTestBoard();
+      updateTestStatus();
+      bindEvents();
+      setBrush('empty');
+      
+      observeResize();
+      setTimeout(() => {
+        updateScrollMode(designBoardWrapper);
+        updateScrollMode(testBoardWrapper);
+      }, 100);
+    }
+    init();
+  })();
+</script>
+</body>
+</html>
