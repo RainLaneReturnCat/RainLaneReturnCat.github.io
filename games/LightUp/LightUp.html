@@ -566,6 +566,134 @@
       padding: 12px;
       border-left: 4px solid #f5e98b;
     }
+
+    /* 游玩记录弹窗优化样式 */
+    .records-stats {
+      background: #1d2e21;
+      border-radius: 24px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .stats-item {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #c0b28b;
+    }
+    .stats-number {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #f5e98b;
+    }
+    .record-item {
+      background: #1d2e21;
+      border-radius: 20px;
+      padding: 14px;
+      border-left: 0px solid #f5e98b;
+      transition: all 0.1s ease;
+      cursor: pointer;
+    }
+    .record-item:hover {
+      background: #2a3a2e;
+      transform: translateX(4px);
+    }
+    .record-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .record-name {
+      color: #f5e98b;
+      font-size: 1rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .record-badge {
+      background: #4a6e52;
+      border-radius: 20px;
+      padding: 2px 8px;
+      font-size: 0.65rem;
+      color: #f3eac2;
+    }
+    .record-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+    .record-detail {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+      color: #c0b28b;
+    }
+    .record-detail-icon {
+      font-size: 0.85rem;
+    }
+    .record-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #3a5a46;
+    }
+    .preview-record-btn {
+      background: #496e52;
+      border: none;
+      border-bottom: 2px solid #2a4a2e;
+      color: #fcf9e7;
+      font-size: 0.7rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.05s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .preview-record-btn:active {
+      transform: translateY(2px);
+    }
+    .delete-record-btn {
+      background: #a04444;
+      border: none;
+      border-bottom: 2px solid #6b2a2a;
+      color: #fcf9e7;
+      font-size: 0.7rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.05s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .delete-record-btn:active {
+      transform: translateY(2px);
+    }
+    .records-footer {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+    .records-footer button {
+      flex: 1;
+    }
+
     .record-name {
       color: #f5e98b;
       font-size: 1rem;
@@ -671,6 +799,22 @@
       width: 100%;
     }
     .goto-editor-btn:active {
+      transform: translateY(2px);
+    }
+   .nogo-editor-btn {
+      background: #4c6b53;
+      border: none;
+      border-bottom: 3px solid #3a5a2e;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 40px;
+      cursor: pointer;
+      margin-top: 16px;
+      width: 100%;
+    }
+    .nogo-editor-btn:active {
       transform: translateY(2px);
     }
 
@@ -894,8 +1038,10 @@
     <div class="records-content">
       <h2>📜 游玩记录</h2>
       <div id="recordsList" class="records-list"></div>
-      <button id="clearRecordsBtn" class="clear-records-btn">🗑️ 清空所有记录</button>
-      <button id="closeRecordsBtn" class="btn" style="margin-top:12px; font-size:0.9rem; padding:8px;">关闭</button>
+      <div class="records-footer">
+        <button id="clearRecordsBtn" class="btn" style=" font-size: 0.85rem; padding: 8px; background: #a04444;">🗑️ 清空所有记录</button>
+        <button id="closeRecordsBtn" class="btn" style="font-size: 0.85rem; padding:8px;">关闭</button>
+      </div>
     </div>
   </div>
 
@@ -912,7 +1058,7 @@
       <p>设计完成后点击「预览并导出」，复制生成的二维数组，然后到<strong>关卡社区</strong>上传分享！</p>
       <div class="code-block">示例输出：[[0,0,0,...],[0,2,0,...],...]</div>
       <button id="gotoEditorBtn" class="goto-editor-btn">🎮 进入关卡工坊</button>
-      <button id="closeEditorRulesBtn" class="btn" style="margin-top:12px; font-size:0.9rem; padding:8px;">暂不前往</button>
+      <button id="closeEditorRulesBtn" class="nogo-editor-btn">暂不前往</button>
     </div>
   </div>
 
@@ -967,12 +1113,16 @@
     const lightsLimitDisplay = document.getElementById('lightsLimitDisplay');
     const currentLightsCountSpan = document.getElementById('currentLightsCount');
     const maxLightsLimitSpan = document.getElementById('maxLightsLimit');
+
+    // 自制关卡支持
+    let isCustomLevelMode = false;
+    let customLevelData = null;
     
     // ---------- 游玩记录功能 ----------
     const RECORDS_KEY = 'lightup_play_records';
     const MAX_RECORDS = 100;
     
-    function savePlayRecord(levelId, levelName, category, size, time, moves, completed) {
+    function savePlayRecord(levelId, levelName, category, size, time, moves, completed, lightsSnapshot) {
       if (!completed) return;
       
       const records = getPlayRecords();
@@ -983,10 +1133,11 @@
         size: size,
         time: time,
         moves: moves,
+        lights: lightsSnapshot ? lightsSnapshot.map(row => [...row]) : null,  // 保存灯光快照
         date: Date.now()
       };
       
-      // 检查是否已有该关卡记录，有则更新最佳成绩（时间更短则替换）
+      // 检查是否已有该关卡记录，有则更新（时间更短则替换）
       const existingIndex = records.findIndex(r => r.id === levelId);
       if (existingIndex !== -1) {
         if (time < records[existingIndex].time) {
@@ -1033,24 +1184,164 @@
         return;
       }
       
-      let html = '';
+      // 计算统计信息
+      let totalTime = 0;
+      let totalMoves = 0;
+      const categoryCount = {};
       for (let r of records) {
+        totalTime += r.time;
+        totalMoves += r.moves;
+        categoryCount[r.category] = (categoryCount[r.category] || 0) + 1;
+      }
+      
+      // 统计头部
+      let html = `
+        <div class="records-stats">
+          <div class="stats-item">📊 总关卡: <span class="stats-number">${records.length}</span></div>
+          <div class="stats-item">⏱️ 总用时: <span class="stats-number">${formatRecordTime(totalTime)}</span></div>
+          <div class="stats-item">🚶 总步数: <span class="stats-number">${totalMoves}</span></div>
+        </div>
+      `;
+      
+      for (let i = 0; i < records.length; i++) {
+        const r = records[i];
         const categoryIcon = {
-          regular: '📖', mirror: '🪞', scatter: '✨', mixed: '🌀'
+          regular: '📖', mirror: '🪞', scatter: '✨', mixed: '🌀', custom: '🎨'
         }[r.category] || '📦';
+        
+        const categoryName = {
+          regular: '常规', mirror: '镜面', scatter: '散射', mixed: '综合', custom: '自制'
+        }[r.category] || r.category;
+        
+        const hasPreview = r.lights && r.lights.length > 0;
+        
         html += `
-          <div class="record-item">
-            <div class="record-name">${categoryIcon} ${escapeHtml(r.name)}</div>
-            <div class="record-info">
-              <span>📐 ${r.size}</span>
-              <span class="record-time">⏱️ ${formatRecordTime(r.time)}</span>
-              <span>🚶 ${r.moves}步</span>
-              <span>📅 ${formatRecordDate(r.date)}</span>
+          <div class="record-item" data-record-id="${r.id}" data-record-index="${i}">
+            <div class="record-header">
+              <div class="record-name">
+                <span>${categoryIcon}</span>
+                <span>${escapeHtml(r.name)}</span>
+              </div>
+              <div class="record-badge">${categoryName}</div>
+            </div>
+            <div class="record-details">
+              <div class="record-detail">
+                <span class="record-detail-icon">📐</span>
+                <span>${r.size}</span>
+              </div>
+              <div class="record-detail">
+                <span class="record-detail-icon">⏱️</span>
+                <span class="record-time">${formatRecordTime(r.time)}</span>
+              </div>
+              <div class="record-detail">
+                <span class="record-detail-icon">🚶</span>
+                <span>${r.moves}步</span>
+              </div>
+              <div class="record-detail">
+                <span class="record-detail-icon">📅</span>
+                <span>${formatRecordDate(r.date)}</span>
+              </div>
+            </div>
+            <div class="record-actions">
+              ${hasPreview ? `<button class="preview-record-btn" data-index="${i}">📸 回顾盘面</button>` : ''}
+              <button class="delete-record-btn" data-index="${i}" data-id="${r.id}">🗑️ 删除</button>
             </div>
           </div>
         `;
       }
+      
       container.innerHTML = html;
+      
+      // 绑定预览按钮事件
+      document.querySelectorAll('.preview-record-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const index = parseInt(btn.dataset.index);
+          const record = records[index];
+          showRecordPreview(record);
+        });
+      });
+      
+      // 绑定删除按钮事件
+      document.querySelectorAll('.delete-record-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const index = parseInt(btn.dataset.index);
+          const record = records[index];
+          if (confirm(`确定要删除记录「${record.name}」吗？`)) {
+            const newRecords = getPlayRecords();
+            newRecords.splice(index, 1);
+            localStorage.setItem(RECORDS_KEY, JSON.stringify(newRecords));
+            renderRecordsModal();
+          }
+        });
+      });
+      
+      // 点击记录项查看详情（可选）
+      document.querySelectorAll('.record-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          // 如果点击的是按钮，不触发
+          if (e.target.tagName === 'BUTTON') return;
+          const index = parseInt(item.dataset.recordIndex);
+          const record = records[index];
+          if (record.lights && record.lights.length > 0) {
+            showRecordPreview(record);
+          }
+        });
+      });
+    }
+    
+    // 显示记录预览（回放通关盘面）
+    function showRecordPreview(record) {
+      if (!record.lights || record.lights.length === 0) {
+        alert('该记录没有保存盘面快照');
+        return;
+      }
+      
+      // 创建预览弹窗
+      const previewModal = document.createElement('div');
+      previewModal.className = 'records-modal';
+      previewModal.style.display = 'flex';
+      
+      const sizeParts = record.size.split('×');
+      const width = parseInt(sizeParts[0]);
+      const height = parseInt(sizeParts[1]);
+      const lightsData = record.lights;
+      
+      // 生成预览棋盘HTML
+      let boardHtml = `<div class="board-grid" style="grid-template-columns: repeat(${width}, 1fr); margin: 0 auto;">`;
+      for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+          const hasLight = lightsData[i]?.[j];
+          if (hasLight) {
+            boardHtml += `<div class="cell light" style="background:#f5e98b; display:flex; align-items:center; justify-content:center;">💡</div>`;
+          } else {
+            boardHtml += `<div class="cell" style="background:#dcedc4;"></div>`;
+          }
+        }
+      }
+      boardHtml += `</div>`;
+      
+      previewModal.innerHTML = `
+        <div class="records-content" style="max-width: 90vw; text-align: center;">
+          <h2>📸 通关盘面回顾</h2>
+          <div style="overflow-x: auto; padding: 16px 0;">
+            ${boardHtml}
+          </div>
+          <div style="color: #c0b28b; margin: 12px 0;">
+            ⏱️ ${formatRecordTime(record.time)} &nbsp;|&nbsp; 🚶 ${record.moves}步 &nbsp;|&nbsp; 📅 ${formatRecordDate(record.date)}
+          </div>
+          <button id="closePreviewBtn" class="btn" style="margin-top: 12px;">关闭</button>
+        </div>
+      `;
+      
+      document.body.appendChild(previewModal);
+      
+      const closeBtn = previewModal.querySelector('#closePreviewBtn');
+      closeBtn.addEventListener('click', () => previewModal.remove());
+      previewModal.addEventListener('click', (e) => {
+        if (e.target === previewModal) previewModal.remove();
+      });
     }
     
     function openRecordsModal() {
@@ -1101,11 +1392,28 @@
     }
 
     function updateInfoDisplay() {
+      // 如果是自制关卡，不覆盖名称
+      if (currentLevel && currentLevel.startsWith('custom_')) {
+        // 只更新时间，不修改关卡名
+        levelTimeDisplay.textContent = formatTime(elapsedSeconds);
+        if (gameActive) {
+          const lightCount = countCurrentLights();
+          currentLightsCountSpan.textContent = lightCount;
+          if (lightCount > currentMaxLights) {
+            lightsLimitDisplay.classList.add('exceed');
+          } else {
+            lightsLimitDisplay.classList.remove('exceed');
+          }
+        }
+        return;
+      }
+  
+      // 普通关卡逻辑
       const parts = currentLevel.split('-');
       const num = parts[2];
       levelNameDisplay.textContent = `关卡${num}`;
       levelTimeDisplay.textContent = formatTime(elapsedSeconds);
-      
+  
       if (gameActive) {
         const lightCount = countCurrentLights();
         currentLightsCountSpan.textContent = lightCount;
@@ -1459,36 +1767,56 @@
       gameActive = false;
       stopTimer();
       
+      // 获取当前灯光布局的快照
+      const lightsSnapshot = lights.map(row => [...row]);
+      
+      // 判断是否是自制关卡
+      const isCustom = currentLevel.startsWith('custom_');
+      let levelId, levelName, categoryName, sizeNum;
+      
+      if (isCustom) {
+        // 自制关卡
+        levelId = currentLevel;
+        levelName = levelNameDisplay.textContent.replace('🎨 ', '');
+        categoryName = currentCategory;
+        sizeNum = `${boardWidth}×${boardHeight}`;
+        
+        // 保存自制关卡记录（带灯光快照）
+        savePlayRecord(levelId, levelName, categoryName, sizeNum, elapsedSeconds, currentMoves, true, lightsSnapshot);
+        
+        victoryMessage.textContent = `🎉 自制关卡「${levelName}」通关！\n用时 ${formatTime(elapsedSeconds)}  步数 ${currentMoves}`;
+        victoryModal.style.display = 'flex';
+        
+        // 修改下一关按钮的文字和行为
+        const nextBtn = document.getElementById('nextLevelBtn');
+        const originalText = nextBtn.textContent;
+        nextBtn.textContent = '🏠 返回社区';
+        
+        // 临时保存通关信息，用于返回社区后的跳转
+        window.customLevelCompleted = true;
+        
+        return;
+      }
+      
+      // 普通关卡逻辑
       markLevelCompleted(currentLevel);
       
-      // 保存游玩记录
+      // 保存游玩记录（带灯光快照）
       const parts = currentLevel.split('-');
       const prefix = parts[0];
-      const sizeNum = parts[1];
+      const sizeNumVal = parts[1];
       const levelNum = parts[2];
-      let categoryName = 'regular';
-      if (prefix === 'R') categoryName = 'regular';
-      else if (prefix === 'M') categoryName = 'mirror';
-      else if (prefix === 'S') categoryName = 'scatter';
-      else if (prefix === 'C') categoryName = 'mixed';
+      let categoryNameVal = 'regular';
+      if (prefix === 'R') categoryNameVal = 'regular';
+      else if (prefix === 'M') categoryNameVal = 'mirror';
+      else if (prefix === 'S') categoryNameVal = 'scatter';
+      else if (prefix === 'C') categoryNameVal = 'mixed';
       
-      savePlayRecord(currentLevel, `关卡${levelNum}`, categoryName, `${sizeNum}×${sizeNum}`, elapsedSeconds, currentMoves, true);
+      savePlayRecord(currentLevel, `关卡${levelNum}`, categoryNameVal, `${sizeNumVal}×${sizeNumVal}`, elapsedSeconds, currentMoves, true, lightsSnapshot);
       
       victoryMessage.textContent = `关卡${currentLevel}完成！\n用时 ${formatTime(elapsedSeconds)}  步数 ${currentMoves}`;
       victoryModal.style.display = 'flex';
       
-      renderLevelGrid();
-    }
-
-    function exitToLevelSelect() {
-      if (gameActive) {
-        gameActive = false;
-        stopTimer();
-      }
-      victoryModal.style.display = 'none';
-      gameScreen.classList.remove('active');
-      levelScreen.classList.add('active');
-      currentScreen = 'level';
       renderLevelGrid();
     }
 
@@ -1511,6 +1839,19 @@
       illuminated = computeIllumination();
       computeInvalidLights();
       renderBoard();
+    }
+
+    // 退出到关卡选择界面
+    function exitToLevelSelect() {
+      if (gameActive) {
+        gameActive = false;
+        stopTimer();
+      }
+      victoryModal.style.display = 'none';
+      gameScreen.classList.remove('active');
+      levelScreen.classList.add('active');
+      currentScreen = 'level';
+      renderLevelGrid();
     }
 
     function loadLevel(levelId, categoryId) {
@@ -1683,7 +2024,85 @@
       }
     }    
 
+    // ---------- 检查并加载自制关卡 ----------
+    function checkAndLoadCustomLevel() {
+      const customLevelStr = sessionStorage.getItem('play_custom_level');
+      if (!customLevelStr) return false;
+      
+      try {
+        customLevelData = JSON.parse(customLevelStr);
+        console.log('🎮 加载自制关卡:', customLevelData.name);
+        isCustomLevelMode = true;
+        sessionStorage.removeItem('play_custom_level');
+        return true;
+      } catch(e) {
+        console.error('解析自制关卡失败:', e);
+        return false;
+      }
+    }
+    
+    // 开始游玩自制关卡
+    function startCustomLevel(level) {
+      boardWidth = level.width;
+      boardHeight = level.height;
+      
+      // 转换 grid：数字数组 -> 游戏内部格式
+      grid = level.grid.map(row => 
+        row.map(cell => {
+          if (cell === 0) return 'empty';
+          if (cell === 1) return 'obstacle';
+          if (cell >= 2 && cell <= 6) return `number:${cell - 2}`;
+          if (cell === 7) return 'mirror1';
+          if (cell === 8) return 'mirror2';
+          if (cell === 9) return 'scatter';
+          return 'empty';
+        })
+      );
+      
+      lights = Array(boardHeight).fill().map(() => Array(boardWidth).fill(false));
+      historyStack = [];
+      currentMoves = 0;
+      currentLevel = `custom_${level.id || Date.now()}`;
+      currentCategory = level.category || 'custom';
+      currentMaxLights = level.maxLights || Math.floor(boardWidth * boardHeight * 0.15);
+      maxLightsLimitSpan.textContent = currentMaxLights;
+      illuminated = computeIllumination();
+      computeInvalidLights();
+      gameActive = true;
+      resetTimer();
+      renderBoard();
+      updateInfoDisplay();
+      
+      // 显示自制关卡名称
+      levelNameDisplay.textContent = `🎨 ${level.name}`;
+      
+      // 清除标志
+      isCustomLevelMode = false;
+      
+      return true;
+    }
+
     function init() {
+      // 先检查是否有自制关卡要加载
+      if (checkAndLoadCustomLevel() && customLevelData) {
+
+        // 直接进入游戏界面
+        mainScreen.classList.remove('active');
+        gameScreen.classList.add('active');
+        currentScreen = 'game';
+        startCustomLevel(customLevelData);
+        setTimeout(updateBoardWrapperScrollMode, 50);
+        // 继续绑定事件但不执行后续的选关界面初始化
+      } 
+
+      else {
+
+        // 正常初始化
+        mainScreen.classList.add('active');
+        levelScreen.classList.remove('active');
+        gameScreen.classList.remove('active');
+      }
+
       loadCompletedLevels();
       renderCategoryTabs();
       
@@ -1738,20 +2157,36 @@
       
       document.getElementById('undoBtn').addEventListener('click', undo);
       document.getElementById('resetBtn').addEventListener('click', resetBoard);
-      document.getElementById('exitGameBtn').addEventListener('click', ()=>{
-        if (gameActive) {
-          gameActive = false;
-          stopTimer();
+      document.getElementById('exitGameBtn').addEventListener('click', () => {
+        // 判断是否是自制关卡
+        if (currentLevel && currentLevel.startsWith('custom_')) {
+          // 自制关卡退出直接返回社区
+          window.location.href = 'LightUpCommunity.html';
+        } else {
+          exitToLevelSelect();
         }
-        gameScreen.classList.remove('active');
-        levelScreen.classList.add('active');
-        currentScreen = 'level';
-        renderLevelGrid();
       });
       
-      document.getElementById('nextLevelBtn').addEventListener('click', nextLevel);
-      document.getElementById('backToLevelBtn').addEventListener('click', ()=>{
+      // 下一关 / 返回社区按钮
+      document.getElementById('nextLevelBtn').addEventListener('click', () => {
         victoryModal.style.display = 'none';
+        // 判断是否是自制关卡通关
+        if (window.customLevelCompleted) {
+          window.customLevelCompleted = false;
+          window.location.href = 'LightUpCommunity.html';
+          return;
+        }
+        nextLevel();
+      });
+
+      document.getElementById('backToLevelBtn').addEventListener('click', () => {
+        victoryModal.style.display = 'none';
+        // 判断是否是自制关卡通关
+        if (window.customLevelCompleted) {
+          window.customLevelCompleted = false;
+          window.location.href = 'LightUpCommunity.html';
+          return;
+        }
         exitToLevelSelect();
       });
       

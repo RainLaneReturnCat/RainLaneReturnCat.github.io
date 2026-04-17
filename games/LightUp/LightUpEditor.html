@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>明灯谜境 · 关卡工坊 (双栏均衡版)</title>
+  <title>明灯谜境 · 关卡工坊</title>
   <style>
     * {
       box-sizing: border-box;
@@ -166,6 +166,16 @@
 
     .icon-btn-sm:active {
       transform: translateY(2px);
+    }
+
+    .icon-btn-sm:disabled {
+      opacity: 0.5;
+      transform: none;
+      cursor: not-allowed;
+      border-bottom: 3px solid #1d3622;
+    }
+    .icon-btn-sm:disabled:active {
+      transform: none;
     }
 
     /* 关键修改：智能滚动与居中 */
@@ -604,11 +614,25 @@
     
     function updateSolvableStatus() {
       isSolvable = checkTestVictory();
+      const exportBtn = document.getElementById('exportJsonBtn');
+      const copyBtn = document.getElementById('copyJsonBtn');
+      
       if (isSolvable) {
         victoryCheckMsg.innerHTML = '🎉 当前测试配置可通关！可以导出关卡 🎉';
         testStatusDiv.innerHTML = '✅ 胜利条件达成！所有空格被照亮，数字约束满足，且无灯被照射！';
+        // 启用导出按钮
+        if (exportBtn) exportBtn.disabled = false;
+        if (copyBtn) copyBtn.disabled = false;
       } else {
-        victoryCheckMsg.innerHTML = '🔧 未满足全部条件，请放置灯泡测试，通关后方可导出';
+        // 获取未满足的具体条件
+        let unlitCount = countUnlitEmpty();
+        let invalidNumCount = getInvalidNumbersTest(testLights, height, width).length;
+        
+        victoryCheckMsg.innerHTML = '🔧 未满足全部条件，请继续放置灯泡';
+        testStatusDiv.innerHTML = ` 未通关：${unlitCount > 0 ? `⚠️ 尚有 ${unlitCount} 个空格未照亮` : ''}${invalidNumCount > 0 ? ` ❌ ${invalidNumCount} 个数字不匹配` : ''}${invalidLights.size > 0 ? ` 🔴 ${invalidLights.size} 盏灯被照射` : ''}`;
+        // 禁用导出按钮
+        if (exportBtn) exportBtn.disabled = true;
+        if (copyBtn) copyBtn.disabled = true;
       }
     }
     
@@ -1021,17 +1045,15 @@
       computeInvalidLights();
       renderTestBoard();
       updateTestStatus();
+      // 添加提示（可选）
+      if (!checkTestVictory()) {
+        // 静默处理，不弹窗
+      }
     }
     
     function showEncodedPreview(){
       const levelArray = exportToLevelArray();
       const lightCount = getCurrentLightsCount();
-      
-      // 验证是否可通关
-      if (!isSolvable) {
-        alert('❌ 关卡尚未通关！请在右侧测试区放置灯泡，确保所有空格被照亮、数字约束满足、无灯被照射后再导出。');
-        return null;
-      }
       
       // 使用当前测试区使用的灯数作为maxLights限制
       const encoded = encodeLevelData(levelArray, lightCount);
@@ -1090,9 +1112,18 @@
         updateScrollMode(designBoardWrapper);
         updateScrollMode(testBoardWrapper);
       }, 100);
+
+      // 初始化时禁用导出按钮（因为刚开始没有通关）
+      const exportBtn = document.getElementById('exportJsonBtn');
+      const copyBtn = document.getElementById('copyJsonBtn');
+      if (exportBtn) exportBtn.disabled = true;
+      if (copyBtn) copyBtn.disabled = true;
     }
+
     init();
+
   })();
+
 </script>
 </body>
 </html>
